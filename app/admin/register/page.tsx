@@ -4,10 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Toast, useToast } from "@/components/Toast";
+import { AuthBackground } from "@/components/AuthBackground";
+import { PasswordInput } from "@/components/PasswordInput";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-type Field = "restaurantName" | "email" | "password";
+type Field = "restaurantName" | "email" | "password" | "confirmPassword";
 
 async function parseResponse(res: Response) {
   try {
@@ -22,6 +24,7 @@ export default function RegisterPage() {
   const [restaurantName, setRestaurantName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<Field, string>>>({});
   const [loading, setLoading] = useState(false);
   const { toast, showToast, dismissToast } = useToast();
@@ -40,6 +43,11 @@ export default function RegisterPage() {
       errors.password = "رمز عبور را وارد کنید";
     } else if (password.length < 6) {
       errors.password = "رمز عبور باید حداقل ۶ کاراکتر باشد";
+    }
+    if (!confirmPassword) {
+      errors.confirmPassword = "تکرار رمز عبور را وارد کنید";
+    } else if (password && confirmPassword !== password) {
+      errors.confirmPassword = "رمز عبور و تکرار آن یکسان نیستند";
     }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -74,13 +82,13 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-6 py-12 bg-paper">
-      <div className="w-full max-w-sm">
+    <AuthBackground>
+      <div className="w-full max-w-sm mx-auto">
         <Link href="/" className="block text-center mb-8">
           <span className="font-display font-semibold text-lg text-ink">منوی دیجیتال</span>
         </Link>
 
-        <div className="bg-card border border-ink/10 rounded-xl shadow-soft p-7 md:p-8">
+        <div className="bg-card border border-ink/10 rounded-xl shadow-lift p-7 md:p-8">
           <h1 className="font-display font-semibold text-2xl text-ink mb-2 text-center">
             ساخت حساب رستوران
           </h1>
@@ -126,18 +134,29 @@ export default function RegisterPage() {
 
             <div>
               <label className="block text-sm text-ink mb-1.5 font-medium">رمز عبور</label>
-              <input
-                type="password"
-                dir="ltr"
+              <PasswordInput
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={`w-full border rounded-md px-4 py-2.5 bg-white text-left focus:outline-none focus:ring-2 transition-shadow ${
-                  fieldErrors.password ? "border-wine ring-wine/20" : "border-ink/20 focus:ring-gold/40"
-                }`}
+                onChange={setPassword}
                 placeholder="حداقل ۶ کاراکتر"
+                hasError={!!fieldErrors.password}
+                autoComplete="new-password"
               />
               {fieldErrors.password && (
                 <p className="text-wine text-xs mt-1.5">{fieldErrors.password}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm text-ink mb-1.5 font-medium">تکرار رمز عبور</label>
+              <PasswordInput
+                value={confirmPassword}
+                onChange={setConfirmPassword}
+                placeholder="رمز عبور را دوباره وارد کنید"
+                hasError={!!fieldErrors.confirmPassword}
+                autoComplete="new-password"
+              />
+              {fieldErrors.confirmPassword && (
+                <p className="text-wine text-xs mt-1.5">{fieldErrors.confirmPassword}</p>
               )}
             </div>
 
@@ -159,6 +178,6 @@ export default function RegisterPage() {
         </p>
       </div>
       <Toast toast={toast} onDismiss={dismissToast} />
-    </main>
+    </AuthBackground>
   );
 }

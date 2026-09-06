@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 
 export const revalidate = 0;
 
@@ -55,6 +56,12 @@ export default async function PublicMenuPage({
             {restaurant.description}
           </p>
         )}
+        <Link
+          href={`/menu/${restaurant.slug}/about`}
+          className="inline-flex items-center gap-1.5 mt-4 text-xs px-3.5 py-1.5 rounded-full border border-gold/40 text-ink/80 hover:bg-gold/10 transition-colors"
+        >
+          درباره ما
+        </Link>
       </header>
 
       {categoriesWithItems.length === 0 ? (
@@ -79,6 +86,13 @@ export default async function PublicMenuPage({
             {categoriesWithItems.map((cat) => (
               <section key={cat.id} id={`cat-${cat.id}`} className="scroll-mt-20">
                 <div className="flex items-center gap-3 mb-6">
+                  {cat.imageUrl && (
+                    <img
+                      src={cat.imageUrl}
+                      alt={cat.name}
+                      className="w-10 h-10 rounded-md object-cover flex-shrink-0"
+                    />
+                  )}
                   <h2 className="font-display font-semibold text-2xl text-ink whitespace-nowrap">
                     {cat.name}
                   </h2>

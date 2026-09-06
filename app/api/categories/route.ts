@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "دسترسی ندارید" }, { status: 401 });
   }
 
-  let body: { name?: string };
+  let body: { name?: string; imageUrl?: string };
   try {
     body = await req.json();
   } catch {
@@ -22,7 +22,11 @@ export async function POST(req: NextRequest) {
 
   try {
     const category = await prisma.category.create({
-      data: { name: body.name.trim(), restaurantId: restaurant.id },
+      data: {
+        name: body.name.trim(),
+        imageUrl: body.imageUrl || null,
+        restaurantId: restaurant.id,
+      },
     });
     return NextResponse.json(category);
   } catch (err) {

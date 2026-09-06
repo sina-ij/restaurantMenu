@@ -17,7 +17,16 @@ export default async function DashboardPage() {
 
   return (
     <DashboardClient
-      restaurant={{ name: restaurant.name, slug: restaurant.slug }}
+      restaurant={{
+        name: restaurant.name,
+        slug: restaurant.slug,
+        description: restaurant.description,
+        logoUrl: restaurant.logoUrl,
+        phone: restaurant.phone,
+        address: restaurant.address,
+        workingHours: restaurant.workingHours,
+        locationUrl: restaurant.locationUrl,
+      }}
       initialCategories={JSON.parse(JSON.stringify(categories))}
     />
   );

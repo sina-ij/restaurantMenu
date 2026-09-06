@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Toast, useToast } from "@/components/Toast";
+import RestaurantSettings, { RestaurantInfo } from "@/components/RestaurantSettings";
 
 type MenuItem = {
   id: string;
@@ -16,6 +17,7 @@ type MenuItem = {
 type Category = {
   id: string;
   name: string;
+  imageUrl: string | null;
   items: MenuItem[];
 };
 
@@ -28,13 +30,14 @@ async function parseResponse(res: Response) {
 }
 
 export default function DashboardClient({
-  restaurant,
+  restaurant: initialRestaurant,
   initialCategories,
 }: {
-  restaurant: { name: string; slug: string };
+  restaurant: RestaurantInfo;
   initialCategories: Category[];
 }) {
   const router = useRouter();
+  const [restaurant, setRestaurant] = useState<RestaurantInfo>(initialRestaurant);
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [categoryError, setCategoryError] = useState("");
@@ -77,6 +80,21 @@ export default function DashboardClient({
     if (res.ok) {
       setCategories(categories.filter((c) => c.id !== id));
       showToast("دسته حذف شد", "success");
+    } else {
+      showToast(data.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید", "error");
+    }
+  }
+
+  async function updateCategoryImage(categoryId: string, imageUrl: string) {
+    const res = await fetch(`/api/categories/${categoryId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imageUrl }),
+    });
+    const data = await parseResponse(res);
+    if (res.ok) {
+      setCategories(categories.map((c) => (c.id === categoryId ? { ...c, imageUrl: data.imageUrl } : c)));
+      showToast("عکس دسته بروزرسانی شد", "success");
     } else {
       showToast(data.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید", "error");
     }
@@ -161,12 +179,17 @@ export default function DashboardClient({
 
   return (
     <main className="min-h-screen px-4 py-8 md:px-10 max-w-3xl mx-auto">
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 pb-6 border-b border-ink/10">
-        <div>
-          <h1 className="font-display font-semibold text-2xl text-ink">{restaurant.name}</h1>
-          <p className="text-muted text-sm mt-1 break-all" dir="ltr">
-            {menuUrl}
-          </p>
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-ink/10">
+        <div className="flex items-center gap-3">
+          {restaurant.logoUrl && (
+            <img src={restaurant.logoUrl} alt={restaurant.name} className="w-12 h-12 rounded-full object-cover" />
+          )}
+          <div>
+            <h1 className="font-display font-semibold text-2xl text-ink">{restaurant.name}</h1>
+            <p className="text-muted text-sm mt-1 break-all" dir="ltr">
+              {menuUrl}
+            </p>
+          </div>
         </div>
         <div className="flex gap-2 flex-shrink-0">
           <button
@@ -183,6 +206,8 @@ export default function DashboardClient({
           </button>
         </div>
       </header>
+
+      <RestaurantSettings restaurant={restaurant} onSave={setRestaurant} showToast={showToast} />
 
       <form onSubmit={addCategory} className="mb-10">
         <div className="flex gap-2">
@@ -217,6 +242,7 @@ export default function DashboardClient({
             onToggle={toggleAvailable}
             onDeleteItem={deleteItem}
             onDeleteCategory={deleteCategory}
+            onUpdateImage={updateCategoryImage}
             showToast={showToast}
           />
         ))}
@@ -239,12 +265,27 @@ function TrashIcon() {
   );
 }
 
+function CameraIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-4 w-4">
+      <path
+        strokeWidth={1.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"
+      />
+      <circle cx="12" cy="13" r="3.2" strokeWidth={1.5} />
+    </svg>
+  );
+}
+
 function CategoryBlock({
   category,
   onAddItem,
   onToggle,
   onDeleteItem,
   onDeleteCategory,
+  onUpdateImage,
   showToast,
 }: {
   category: Category;
@@ -255,6 +296,7 @@ function CategoryBlock({
   onToggle: (item: MenuItem, categoryId: string) => void;
   onDeleteItem: (itemId: string, categoryId: string) => void;
   onDeleteCategory: (id: string) => void;
+  onUpdateImage: (categoryId: string, imageUrl: string) => void;
   showToast: (message: string, type?: "success" | "error") => void;
 }) {
   const [showForm, setShowForm] = useState(false);
@@ -263,6 +305,7 @@ function CategoryBlock({
   const [price, setPrice] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadingCategoryImage, setUploadingCategoryImage] = useState(false);
   const [saving, setSaving] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{ name?: string; price?: string }>({});
 
@@ -277,6 +320,22 @@ function CategoryBlock({
     setUploading(false);
     if (res.ok) {
       setImageUrl(data.url);
+    } else {
+      showToast(data.error || "آپلود عکس با خطا مواجه شد", "error");
+    }
+  }
+
+  async function handleCategoryImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingCategoryImage(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/upload", { method: "POST", body: formData });
+    const data = await parseResponse(res);
+    setUploadingCategoryImage(false);
+    if (res.ok) {
+      onUpdateImage(category.id, data.url);
     } else {
       showToast(data.error || "آپلود عکس با خطا مواجه شد", "error");
     }
@@ -316,7 +375,20 @@ function CategoryBlock({
   return (
     <section className="border border-ink/10 rounded-xl p-5 bg-card shadow-soft">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="font-display font-semibold text-xl text-ink">{category.name}</h2>
+        <div className="flex items-center gap-3">
+          <label className="relative flex-shrink-0 cursor-pointer group">
+            {category.imageUrl ? (
+              <img src={category.imageUrl} alt={category.name} className="w-10 h-10 rounded-md object-cover" />
+            ) : (
+              <span className="flex w-10 h-10 rounded-md bg-paper border border-ink/10 items-center justify-center text-muted group-hover:text-gold transition-colors">
+                <CameraIcon />
+              </span>
+            )}
+            <input type="file" accept="image/*" onChange={handleCategoryImageChange} className="hidden" />
+          </label>
+          <h2 className="font-display font-semibold text-xl text-ink">{category.name}</h2>
+          {uploadingCategoryImage && <span className="text-xs text-muted">در حال آپلود...</span>}
+        </div>
         <div className="flex gap-3 items-center">
           <button
             onClick={() => setShowForm(!showForm)}

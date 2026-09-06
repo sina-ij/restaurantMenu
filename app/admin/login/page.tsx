@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Toast, useToast } from "@/components/Toast";
+import { AuthBackground } from "@/components/AuthBackground";
+import { PasswordInput } from "@/components/PasswordInput";
 
 type Field = "email" | "password";
 
@@ -60,13 +62,13 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-6 py-12 bg-paper">
-      <div className="w-full max-w-sm">
+    <AuthBackground>
+      <div className="w-full max-w-sm mx-auto">
         <Link href="/" className="block text-center mb-8">
           <span className="font-display font-semibold text-lg text-ink">منوی دیجیتال</span>
         </Link>
 
-        <div className="bg-card border border-ink/10 rounded-xl shadow-soft p-7 md:p-8">
+        <div className="bg-card border border-ink/10 rounded-xl shadow-lift p-7 md:p-8">
           <h1 className="font-display font-semibold text-2xl text-ink mb-8 text-center">
             ورود ادمین
           </h1>
@@ -87,14 +89,11 @@ export default function LoginPage() {
             </div>
             <div>
               <label className="block text-sm text-ink mb-1.5 font-medium">رمز عبور</label>
-              <input
-                type="password"
-                dir="ltr"
+              <PasswordInput
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={`w-full border rounded-md px-4 py-2.5 bg-white text-left focus:outline-none focus:ring-2 transition-shadow ${
-                  fieldErrors.password ? "border-wine ring-wine/20" : "border-ink/20 focus:ring-gold/40"
-                }`}
+                onChange={setPassword}
+                hasError={!!fieldErrors.password}
+                autoComplete="current-password"
               />
               {fieldErrors.password && (
                 <p className="text-wine text-xs mt-1.5">{fieldErrors.password}</p>
@@ -117,8 +116,24 @@ export default function LoginPage() {
             ثبت‌نام کنید
           </Link>
         </p>
+
+        <div className="mt-10 pt-6 border-t border-ink/10 text-center">
+          <p className="text-muted text-xs leading-relaxed max-w-xs mx-auto">
+            این سامانه ابزاری ساده برای ساخت منوی دیجیتال رستوران و کافه‌ست؛ منوی خودتون
+            رو بسازید، از آن QR کد بگیرید و هر وقت خواستید به‌روزش کنید — تغییرات همون
+            لحظه برای مشتری نمایش داده می‌شه.
+          </p>
+          <a
+            href="https://t.me/sina_ij"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block text-xs text-gold hover:underline mt-3"
+          >
+            پشتیبانی و ارتباط با ما در تلگرام: @sina_ij
+          </a>
+        </div>
       </div>
       <Toast toast={toast} onDismiss={dismissToast} />
-    </main>
+    </AuthBackground>
   );
 }
