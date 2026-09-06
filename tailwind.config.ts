@@ -8,15 +8,26 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#2B2118",
-        paper: "#F7F2E9",
-        saffron: "#C98A2C",
-        olive: "#6B7A4F",
-        muted: "#8A7F6D",
+        ink: "#221A13",
+        paper: "#FBF6EC",
+        card: "#FFFDF8",
+        gold: "#AB7C33",
+        saffron: "#AB7C33",
+        wine: "#7A2B33",
+        olive: "#5F6E45",
+        muted: "#8B8072",
+        line: "#221A13",
       },
       fontFamily: {
-        display: ["var(--font-fraunces)", "serif"],
-        body: ["var(--font-worksans)", "sans-serif"],
+        display: ["var(--font-naskh)", "serif"],
+        body: ["var(--font-vazirmatn)", "sans-serif"],
+      },
+      boxShadow: {
+        soft: "0 1px 2px rgba(34, 26, 19, 0.06), 0 8px 24px -12px rgba(34, 26, 19, 0.18)",
+        lift: "0 2px 4px rgba(34, 26, 19, 0.08), 0 16px 32px -16px rgba(34, 26, 19, 0.28)",
+      },
+      backgroundImage: {
+        "grain": "radial-gradient(rgba(34,26,19,0.05) 1px, transparent 1px)",
       },
     },
   },

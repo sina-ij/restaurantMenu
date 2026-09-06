@@ -16,12 +16,30 @@ export async function PUT(
     return NextResponse.json({ error: "یافت نشد" }, { status: 404 });
   }
 
-  const { name } = await req.json();
-  const updated = await prisma.category.update({
-    where: { id: params.id },
-    data: { name },
-  });
-  return NextResponse.json(updated);
+  let body: { name?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "اطلاعات ارسالی نامعتبر است" }, { status: 400 });
+  }
+
+  if (!body.name || !body.name.trim()) {
+    return NextResponse.json({ error: "نام دسته الزامی است" }, { status: 400 });
+  }
+
+  try {
+    const updated = await prisma.category.update({
+      where: { id: params.id },
+      data: { name: body.name.trim() },
+    });
+    return NextResponse.json(updated);
+  } catch (err) {
+    console.error("update category error:", err);
+    return NextResponse.json(
+      { error: "خطایی در سرور رخ داد. لطفاً دوباره تلاش کنید" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function DELETE(
@@ -38,6 +56,14 @@ export async function DELETE(
     return NextResponse.json({ error: "یافت نشد" }, { status: 404 });
   }
 
-  await prisma.category.delete({ where: { id: params.id } });
-  return NextResponse.json({ ok: true });
+  try {
+    await prisma.category.delete({ where: { id: params.id } });
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("delete category error:", err);
+    return NextResponse.json(
+      { error: "خطایی در سرور رخ داد. لطفاً دوباره تلاش کنید" },
+      { status: 500 }
+    );
+  }
 }

@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
-import { Fraunces, Work_Sans } from "next/font/google";
+import { Vazirmatn, Noto_Naskh_Arabic } from "next/font/google";
 import "./globals.css";
 
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-fraunces",
-  weight: ["400", "500", "600"],
+const vazirmatn = Vazirmatn({
+  subsets: ["arabic", "latin"],
+  variable: "--font-vazirmatn",
+  weight: ["400", "500", "600", "700"],
 });
 
-const workSans = Work_Sans({
-  subsets: ["latin"],
-  variable: "--font-worksans",
-  weight: ["400", "500", "600"],
+const notoNaskh = Noto_Naskh_Arabic({
+  subsets: ["arabic", "latin"],
+  variable: "--font-naskh",
+  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -26,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fa" dir="rtl">
-      <body className={`${fraunces.variable} ${workSans.variable} font-body bg-paper text-ink`}>
+      <body className={`${vazirmatn.variable} ${notoNaskh.variable} font-body bg-paper text-ink`}>
         {children}
       </body>
     </html>

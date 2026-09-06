@@ -25,19 +25,48 @@ export async function PUT(
     return NextResponse.json({ error: "یافت نشد" }, { status: 404 });
   }
 
-  const body = await req.json();
-  const updated = await prisma.menuItem.update({
-    where: { id: params.id },
-    data: {
-      name: body.name ?? existing.name,
-      description: body.description ?? existing.description,
-      price: body.price !== undefined ? parseInt(body.price, 10) : existing.price,
-      imageUrl: body.imageUrl ?? existing.imageUrl,
-      available: body.available ?? existing.available,
-    },
-  });
+  let body: {
+    name?: string;
+    description?: string;
+    price?: string | number;
+    imageUrl?: string;
+    available?: boolean;
+  };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "اطلاعات ارسالی نامعتبر است" }, { status: 400 });
+  }
 
-  return NextResponse.json(updated);
+  let price = existing.price;
+  if (body.price !== undefined) {
+    const parsed = typeof body.price === "number" ? body.price : parseInt(body.price, 10);
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      return NextResponse.json({ error: "قیمت باید یک عدد معتبر باشد" }, { status: 400 });
+    }
+    price = parsed;
+  }
+
+  try {
+    const updated = await prisma.menuItem.update({
+      where: { id: params.id },
+      data: {
+        name: body.name ?? existing.name,
+        description: body.description ?? existing.description,
+        price,
+        imageUrl: body.imageUrl ?? existing.imageUrl,
+        available: body.available ?? existing.available,
+      },
+    });
+
+    return NextResponse.json(updated);
+  } catch (err) {
+    console.error("update menu item error:", err);
+    return NextResponse.json(
+      { error: "خطایی در سرور رخ داد. لطفاً دوباره تلاش کنید" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function DELETE(
@@ -54,6 +83,14 @@ export async function DELETE(
     return NextResponse.json({ error: "یافت نشد" }, { status: 404 });
   }
 
-  await prisma.menuItem.delete({ where: { id: params.id } });
-  return NextResponse.json({ ok: true });
+  try {
+    await prisma.menuItem.delete({ where: { id: params.id } });
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("delete menu item error:", err);
+    return NextResponse.json(
+      { error: "خطایی در سرور رخ داد. لطفاً دوباره تلاش کنید" },
+      { status: 500 }
+    );
+  }
 }

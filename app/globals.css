@@ -6,6 +6,40 @@
   border-color: theme("colors.ink" / 12%);
 }
 
+html {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
 body {
   min-height: 100vh;
+}
+
+::selection {
+  background-color: theme("colors.gold" / 25%);
+  color: theme("colors.ink");
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: theme("colors.ink" / 15%);
+  border-radius: 999px;
+  border: 2px solid theme("colors.paper");
+}
+
+input,
+textarea {
+  font-family: inherit;
+}
+
+/* حذف تقویم/فلش پیش‌فرض مرورگر روی input های عددی برای ظاهر یکدست‌تر */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  margin: 0;
 }

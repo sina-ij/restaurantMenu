@@ -13,7 +13,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "دسترسی ندارید" }, { status: 401 });
   }
 
-  const formData = await req.formData();
+  let formData: FormData;
+  try {
+    formData = await req.formData();
+  } catch {
+    return NextResponse.json({ error: "اطلاعات ارسالی نامعتبر است" }, { status: 400 });
+  }
+
   const file = formData.get("file") as File | null;
 
   if (!file) {
@@ -28,15 +34,31 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
+  const maxSize = 5 * 1024 * 1024;
+  if (file.size > maxSize) {
+    return NextResponse.json(
+      { error: "حجم فایل نباید بیشتر از ۵ مگابایت باشد" },
+      { status: 400 }
+    );
+  }
 
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(uploadDir, { recursive: true });
+  try {
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
 
-  const ext = file.name.split(".").pop();
-  const filename = `${restaurant.id}-${Date.now()}.${ext}`;
-  await writeFile(path.join(uploadDir, filename), buffer);
+    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    await mkdir(uploadDir, { recursive: true });
 
-  return NextResponse.json({ url: `/uploads/${filename}` });
+    const ext = file.name.split(".").pop();
+    const filename = `${restaurant.id}-${Date.now()}.${ext}`;
+    await writeFile(path.join(uploadDir, filename), buffer);
+
+    return NextResponse.json({ url: `/uploads/${filename}` });
+  } catch (err) {
+    console.error("upload error:", err);
+    return NextResponse.json(
+      { error: "خطایی در آپلود فایل رخ داد. لطفاً دوباره تلاش کنید" },
+      { status: 500 }
+    );
+  }
 }
