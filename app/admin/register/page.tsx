@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Toast, useToast } from "@/components/Toast";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -22,8 +23,8 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<Field, string>>>({});
-  const [formError, setFormError] = useState("");
   const [loading, setLoading] = useState(false);
+  const { toast, showToast, dismissToast } = useToast();
 
   function validate() {
     const errors: Partial<Record<Field, string>> = {};
@@ -46,7 +47,6 @@ export default function RegisterPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setFormError("");
     if (!validate()) return;
 
     setLoading(true);
@@ -59,14 +59,15 @@ export default function RegisterPage() {
       const data = await parseResponse(res);
 
       if (!res.ok) {
-        setFormError(data.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید");
+        showToast(data.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید", "error");
         return;
       }
 
+      showToast("حساب با موفقیت ساخته شد", "success");
       router.push("/admin/dashboard");
       router.refresh();
     } catch {
-      setFormError("ارتباط با سرور برقرار نشد. اتصال اینترنت را بررسی کنید");
+      showToast("ارتباط با سرور برقرار نشد. اتصال اینترنت را بررسی کنید", "error");
     } finally {
       setLoading(false);
     }
@@ -140,12 +141,6 @@ export default function RegisterPage() {
               )}
             </div>
 
-            {formError && (
-              <p className="text-wine text-sm bg-wine/5 border border-wine/20 rounded-md px-3 py-2">
-                {formError}
-              </p>
-            )}
-
             <button
               type="submit"
               disabled={loading}
@@ -163,6 +158,7 @@ export default function RegisterPage() {
           </Link>
         </p>
       </div>
+      <Toast toast={toast} onDismiss={dismissToast} />
     </main>
   );
 }

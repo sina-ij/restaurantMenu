@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword, signSession, COOKIE_NAME } from "@/lib/auth";
+import { toApiError } from "@/lib/apiError";
 
 export async function POST(req: NextRequest) {
   let body: { email?: string; password?: string };
@@ -50,9 +51,7 @@ export async function POST(req: NextRequest) {
     return res;
   } catch (err) {
     console.error("login error:", err);
-    return NextResponse.json(
-      { error: "خطایی در سرور رخ داد. لطفاً دوباره تلاش کنید" },
-      { status: 500 }
-    );
+    const { message, status } = toApiError(err);
+    return NextResponse.json({ error: message }, { status });
   }
 }

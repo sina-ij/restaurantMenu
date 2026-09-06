@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurant } from "@/lib/getCurrentRestaurant";
+import { toApiError } from "@/lib/apiError";
 
 export async function PUT(
   req: NextRequest,
@@ -35,10 +36,8 @@ export async function PUT(
     return NextResponse.json(updated);
   } catch (err) {
     console.error("update category error:", err);
-    return NextResponse.json(
-      { error: "خطایی در سرور رخ داد. لطفاً دوباره تلاش کنید" },
-      { status: 500 }
-    );
+    const { message, status } = toApiError(err);
+    return NextResponse.json({ error: message }, { status });
   }
 }
 
@@ -61,9 +60,7 @@ export async function DELETE(
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("delete category error:", err);
-    return NextResponse.json(
-      { error: "خطایی در سرور رخ داد. لطفاً دوباره تلاش کنید" },
-      { status: 500 }
-    );
+    const { message, status } = toApiError(err);
+    return NextResponse.json({ error: message }, { status });
   }
 }

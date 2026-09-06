@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentRestaurant } from "@/lib/getCurrentRestaurant";
+import { toApiError } from "@/lib/apiError";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
@@ -56,9 +57,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: `/uploads/${filename}` });
   } catch (err) {
     console.error("upload error:", err);
-    return NextResponse.json(
-      { error: "خطایی در آپلود فایل رخ داد. لطفاً دوباره تلاش کنید" },
-      { status: 500 }
-    );
+    const { message, status } = toApiError(err);
+    return NextResponse.json({ error: message }, { status });
   }
 }

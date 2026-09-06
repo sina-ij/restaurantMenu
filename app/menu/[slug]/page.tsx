@@ -35,33 +35,26 @@ export default async function PublicMenuPage({
 
   return (
     <main className="min-h-screen bg-paper">
-      <header className="relative border-b border-ink/10 px-6 pt-12 pb-8 text-center overflow-hidden">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.3] bg-grain"
-          style={{ backgroundSize: "16px 16px" }}
-          aria-hidden="true"
-        />
-        <div className="relative">
-          {restaurant.logoUrl ? (
-            <img
-              src={restaurant.logoUrl}
-              alt={restaurant.name}
-              className="w-16 h-16 rounded-full object-cover mx-auto mb-4 border-2 border-white shadow-soft"
-            />
-          ) : (
-            <div className="flex items-center justify-center gap-2 text-gold mb-4" aria-hidden="true">
-              <span className="h-px w-8 bg-gold/40" />
-              <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
-              <span className="h-px w-8 bg-gold/40" />
-            </div>
-          )}
-          <h1 className="font-display font-semibold text-3xl text-ink">{restaurant.name}</h1>
-          {restaurant.description && (
-            <p className="text-muted mt-2 text-sm max-w-md mx-auto leading-relaxed">
-              {restaurant.description}
-            </p>
-          )}
-        </div>
+      <header className="border-b border-ink/10 px-6 pt-12 pb-8 text-center">
+        {restaurant.logoUrl ? (
+          <img
+            src={restaurant.logoUrl}
+            alt={restaurant.name}
+            className="w-16 h-16 rounded-full object-cover mx-auto mb-4 border-2 border-white shadow-soft"
+          />
+        ) : (
+          <div className="flex items-center justify-center gap-2 text-gold mb-4" aria-hidden="true">
+            <span className="h-px w-8 bg-gold/40" />
+            <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
+            <span className="h-px w-8 bg-gold/40" />
+          </div>
+        )}
+        <h1 className="font-display font-semibold text-3xl text-ink">{restaurant.name}</h1>
+        {restaurant.description && (
+          <p className="text-muted mt-2 text-sm max-w-md mx-auto leading-relaxed">
+            {restaurant.description}
+          </p>
+        )}
       </header>
 
       {categoriesWithItems.length === 0 ? (

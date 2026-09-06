@@ -26,9 +26,6 @@ const config: Config = {
         soft: "0 1px 2px rgba(34, 26, 19, 0.06), 0 8px 24px -12px rgba(34, 26, 19, 0.18)",
         lift: "0 2px 4px rgba(34, 26, 19, 0.08), 0 16px 32px -16px rgba(34, 26, 19, 0.28)",
       },
-      backgroundImage: {
-        "grain": "radial-gradient(rgba(34,26,19,0.05) 1px, transparent 1px)",
-      },
     },
   },
   plugins: [],

@@ -35,14 +35,8 @@ const features = [
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen overflow-hidden">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.35] bg-grain"
-        style={{ backgroundSize: "18px 18px" }}
-        aria-hidden="true"
-      />
-
-      <section className="relative flex flex-col items-center px-6 py-20 md:py-28 max-w-2xl mx-auto text-center">
+    <main className="min-h-screen bg-paper">
+      <section className="flex flex-col items-center px-6 py-20 md:py-28 max-w-2xl mx-auto text-center">
         <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-4 py-1.5 text-xs text-ink/80 font-body mb-8">
           منوی دیجیتال با QR کد
         </span>

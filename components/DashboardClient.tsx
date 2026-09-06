@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Toast, useToast } from "@/components/Toast";
 
 type MenuItem = {
   id: string;
@@ -37,8 +38,8 @@ export default function DashboardClient({
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [categoryError, setCategoryError] = useState("");
-  const [copied, setCopied] = useState(false);
   const [menuUrl, setMenuUrl] = useState("");
+  const { toast, showToast, dismissToast } = useToast();
 
   useState(() => {
     if (typeof window !== "undefined") {
@@ -63,15 +64,22 @@ export default function DashboardClient({
     if (res.ok) {
       setCategories([...categories, { ...data, items: [] }]);
       setNewCategoryName("");
+      showToast("دسته اضافه شد", "success");
     } else {
-      setCategoryError(data.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید");
+      showToast(data.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید", "error");
     }
   }
 
   async function deleteCategory(id: string) {
     if (!confirm("این دسته و همه‌ی آیتم‌های داخلش حذف بشه؟")) return;
     const res = await fetch(`/api/categories/${id}`, { method: "DELETE" });
-    if (res.ok) setCategories(categories.filter((c) => c.id !== id));
+    const data = await parseResponse(res);
+    if (res.ok) {
+      setCategories(categories.filter((c) => c.id !== id));
+      showToast("دسته حذف شد", "success");
+    } else {
+      showToast(data.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید", "error");
+    }
   }
 
   async function addItem(
@@ -90,6 +98,7 @@ export default function DashboardClient({
           c.id === categoryId ? { ...c, items: [...c.items, data] } : c
         )
       );
+      showToast("آیتم اضافه شد", "success");
       return { ok: true };
     }
     return { ok: false, error: data.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید" };
@@ -114,12 +123,16 @@ export default function DashboardClient({
             : c
         )
       );
+    } else {
+      const data = await parseResponse(res);
+      showToast(data.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید", "error");
     }
   }
 
   async function deleteItem(itemId: string, categoryId: string) {
     if (!confirm("این آیتم حذف بشه؟")) return;
     const res = await fetch(`/api/menu-items/${itemId}`, { method: "DELETE" });
+    const data = await parseResponse(res);
     if (res.ok) {
       setCategories(
         categories.map((c) =>
@@ -128,6 +141,9 @@ export default function DashboardClient({
             : c
         )
       );
+      showToast("آیتم حذف شد", "success");
+    } else {
+      showToast(data.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید", "error");
     }
   }
 
@@ -140,8 +156,7 @@ export default function DashboardClient({
   function copyMenuUrl() {
     if (!menuUrl) return;
     navigator.clipboard.writeText(menuUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    showToast("لینک منو کپی شد", "success");
   }
 
   return (
@@ -158,7 +173,7 @@ export default function DashboardClient({
             onClick={copyMenuUrl}
             className="text-sm border border-ink/20 px-4 py-2 rounded-md hover:bg-ink/5 transition-colors"
           >
-            {copied ? "کپی شد ✓" : "کپی لینک منو"}
+            کپی لینک منو
           </button>
           <button
             onClick={handleLogout}
@@ -202,6 +217,7 @@ export default function DashboardClient({
             onToggle={toggleAvailable}
             onDeleteItem={deleteItem}
             onDeleteCategory={deleteCategory}
+            showToast={showToast}
           />
         ))}
         {categories.length === 0 && (
@@ -210,6 +226,7 @@ export default function DashboardClient({
           </p>
         )}
       </div>
+      <Toast toast={toast} onDismiss={dismissToast} />
     </main>
   );
 }
@@ -228,6 +245,7 @@ function CategoryBlock({
   onToggle,
   onDeleteItem,
   onDeleteCategory,
+  showToast,
 }: {
   category: Category;
   onAddItem: (
@@ -237,6 +255,7 @@ function CategoryBlock({
   onToggle: (item: MenuItem, categoryId: string) => void;
   onDeleteItem: (itemId: string, categoryId: string) => void;
   onDeleteCategory: (id: string) => void;
+  showToast: (message: string, type?: "success" | "error") => void;
 }) {
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
@@ -246,13 +265,11 @@ function CategoryBlock({
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{ name?: string; price?: string }>({});
-  const [formError, setFormError] = useState("");
 
   async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    setFormError("");
     const formData = new FormData();
     formData.append("file", file);
     const res = await fetch("/api/upload", { method: "POST", body: formData });
@@ -261,7 +278,7 @@ function CategoryBlock({
     if (res.ok) {
       setImageUrl(data.url);
     } else {
-      setFormError(data.error || "آپلود عکس با خطا مواجه شد");
+      showToast(data.error || "آپلود عکس با خطا مواجه شد", "error");
     }
   }
 
@@ -280,7 +297,6 @@ function CategoryBlock({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setFormError("");
     if (!validate()) return;
     setSaving(true);
     const result = await onAddItem(category.id, { name, description, price, imageUrl });
@@ -293,7 +309,7 @@ function CategoryBlock({
       setFieldErrors({});
       setShowForm(false);
     } else {
-      setFormError(result.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید");
+      showToast(result.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید", "error");
     }
   }
 
@@ -368,12 +384,6 @@ function CategoryBlock({
               <img src={imageUrl} alt="پیش‌نمایش" className="w-16 h-16 rounded-md object-cover mt-2" />
             )}
           </div>
-
-          {formError && (
-            <p className="text-wine text-sm bg-wine/5 border border-wine/20 rounded-md px-3 py-2">
-              {formError}
-            </p>
-          )}
 
           <button
             type="submit"
