@@ -67,6 +67,7 @@ export async function PUT(req: NextRequest) {
 
   let body: {
     name?: string;
+    slug?: string;
     description?: string;
     phone?: string;
     address?: string;
@@ -84,11 +85,36 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "نام رستوران/کافه الزامی است" }, { status: 400 });
   }
 
+  let slug = restaurant.slug;
+  if (body.slug !== undefined) {
+    const trimmedSlug = body.slug.trim().toLowerCase();
+    if (!trimmedSlug) {
+      return NextResponse.json({ error: "آدرس منو الزامی است" }, { status: 400 });
+    }
+    if (!SLUG_RE.test(trimmedSlug)) {
+      return NextResponse.json(
+        { error: "آدرس منو فقط می‌تواند شامل حروف انگلیسی کوچک، عدد و خط تیره باشد" },
+        { status: 400 }
+      );
+    }
+    if (trimmedSlug !== restaurant.slug) {
+      const slugTaken = await prisma.restaurant.findUnique({ where: { slug: trimmedSlug } });
+      if (slugTaken) {
+        return NextResponse.json(
+          { error: "این آدرس قبلاً استفاده شده، یک آدرس دیگر انتخاب کنید" },
+          { status: 409 }
+        );
+      }
+    }
+    slug = trimmedSlug;
+  }
+
   try {
     const updated = await prisma.restaurant.update({
       where: { id: restaurant.id },
       data: {
         name: body.name?.trim() ?? restaurant.name,
+        slug,
         description: body.description?.trim() || null,
         phone: body.phone?.trim() || null,
         address: body.address?.trim() || null,

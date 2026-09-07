@@ -3,11 +3,16 @@ import { cookies } from "next/headers";
 import { verifySession, COOKIE_NAME } from "./auth";
 import { prisma } from "./prisma";
 
-export const getCurrentUserId = cache(async () => {
+export const getCurrentSession = cache(async () => {
   const token = cookies().get(COOKIE_NAME)?.value;
   if (!token) return null;
 
   const session = await verifySession(token);
+  return session;
+});
+
+export const getCurrentUserId = cache(async () => {
+  const session = await getCurrentSession();
   return session?.userId ?? null;
 });
 

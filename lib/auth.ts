@@ -14,7 +14,7 @@ export async function verifyPassword(password: string, hash: string) {
   return bcrypt.compare(password, hash);
 }
 
-export async function signSession(payload: { userId: string; restaurantId?: string }) {
+export async function signSession(payload: { userId: string; role: "SUPER_ADMIN" | "OWNER" }) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -25,7 +25,7 @@ export async function signSession(payload: { userId: string; restaurantId?: stri
 export async function verifySession(token: string) {
   try {
     const { payload } = await jwtVerify(token, key);
-    return payload as { userId: string; restaurantId?: string };
+    return payload as { userId: string; role: "SUPER_ADMIN" | "OWNER" };
   } catch {
     return null;
   }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 function MenuIcon() {
   return (
@@ -20,60 +21,12 @@ function CloseIcon() {
   );
 }
 
-function SunIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-5 w-5">
-      <circle cx="12" cy="12" r="4" strokeWidth={1.5} />
-      <path
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        d="M12 2.5v2M12 19.5v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2.5 12h2M19.5 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"
-      />
-    </svg>
-  );
-}
-
-function MoonIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-5 w-5">
-      <path strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" />
-    </svg>
-  );
-}
-
 function UserIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-5 w-5">
       <circle cx="12" cy="8" r="3.5" strokeWidth={1.5} />
       <path strokeWidth={1.5} strokeLinecap="round" d="M4.5 20c1.5-4 5-5.5 7.5-5.5s6 1.5 7.5 5.5" />
     </svg>
-  );
-}
-
-function ThemeToggle() {
-  const [dark, setDark] = useState(false);
-
-  useEffect(() => {
-    setDark(document.documentElement.classList.contains("dark"));
-  }, []);
-
-  function toggle() {
-    const next = !dark;
-    setDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    try {
-      localStorage.setItem("theme", next ? "dark" : "light");
-    } catch {}
-  }
-
-  return (
-    <button
-      onClick={toggle}
-      className="p-2 rounded-md text-ink/70 hover:bg-ink/5 transition-colors"
-      aria-label={dark ? "حالت روشن" : "حالت تاریک"}
-    >
-      {dark ? <SunIcon /> : <MoonIcon />}
-    </button>
   );
 }
 
@@ -151,7 +104,26 @@ export default function AdminChrome({
             >
               <MenuIcon />
             </button>
-            <span className="font-display font-semibold text-ink">پنل مدیریت</span>
+            {restaurant ? (
+              <div className="flex items-center gap-2">
+                {restaurant.logoUrl ? (
+                  <img
+                    src={restaurant.logoUrl}
+                    alt={restaurant.name}
+                    className="w-7 h-7 rounded-full object-cover"
+                  />
+                ) : (
+                  <span className="flex w-7 h-7 rounded-full bg-gold/10 items-center justify-center text-gold text-xs font-display font-semibold">
+                    {restaurant.name.charAt(0)}
+                  </span>
+                )}
+                <span className="font-display font-semibold text-ink truncate max-w-[10rem]">
+                  {restaurant.name}
+                </span>
+              </div>
+            ) : (
+              <span className="font-display font-semibold text-ink">پنل مدیریت</span>
+            )}
           </div>
           <div className="flex items-center gap-1">
             <ThemeToggle />

@@ -37,10 +37,10 @@ export async function POST(req: NextRequest) {
 
     const token = await signSession({
       userId: user.id,
-      restaurantId: user.restaurant?.id,
+      role: user.role,
     });
 
-    const res = NextResponse.json({ slug: user.restaurant?.slug });
+    const res = NextResponse.json({ role: user.role, slug: user.restaurant?.slug });
     res.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

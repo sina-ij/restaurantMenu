@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Toast, useToast } from "@/components/Toast";
 import { AuthBackground } from "@/components/AuthBackground";
 import { PasswordInput } from "@/components/PasswordInput";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 type Field = "email" | "password";
 
@@ -52,7 +53,7 @@ export default function LoginPage() {
       }
 
       showToast("خوش آمدید", "success");
-      router.push("/admin/dashboard");
+      router.push(data.role === "SUPER_ADMIN" ? "/admin/super" : "/admin/dashboard");
       router.refresh();
     } catch {
       showToast("ارتباط با سرور برقرار نشد. اتصال اینترنت را بررسی کنید", "error");
@@ -63,6 +64,9 @@ export default function LoginPage() {
 
   return (
     <AuthBackground>
+      <div className="absolute top-4 left-4 z-10">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-sm mx-auto">
         <Link href="/" className="block text-center mb-8">
           <span className="font-display font-semibold text-lg text-ink">منوی دیجیتال</span>
@@ -109,13 +113,6 @@ export default function LoginPage() {
             </button>
           </form>
         </div>
-
-        <p className="text-center text-sm text-muted mt-6">
-          حساب ندارید؟{" "}
-          <Link href="/admin/register" className="text-gold hover:underline">
-            ثبت‌نام کنید
-          </Link>
-        </p>
 
         <div className="mt-10 pt-6 border-t border-ink/10 text-center">
           <p className="text-muted text-xs leading-relaxed max-w-xs mx-auto">

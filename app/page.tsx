@@ -69,18 +69,12 @@ export default function Home() {
           QR کد در اختیار مشتری بذارید — همون لحظه که تغییرش می‌دید، برای مشتری هم اعمال میشه.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
-          <Link
-            href="/admin/register"
-            className="bg-ink text-paper px-8 py-3 rounded-md font-body font-medium shadow-lift hover:bg-ink/90 transition-colors"
-          >
-            ساخت منوی رستوران من
-          </Link>
+        <div className="flex justify-center mb-8">
           <Link
             href="/admin/login"
-            className="border border-ink/20 text-ink px-8 py-3 rounded-md font-body font-medium hover:bg-ink/5 transition-colors"
+            className="bg-ink text-paper px-10 py-3 rounded-md font-body font-medium shadow-lift hover:bg-ink/90 transition-colors"
           >
-            ورود ادمین
+            ورود
           </Link>
         </div>
 

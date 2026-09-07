@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "seed:super-admin": "node prisma/seed-super-admin.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed-super-admin.js"
   },
   "dependencies": {
     "@prisma/client": "^5.19.1",
@@ -15,8 +19,7 @@
     "jose": "^5.9.3",
     "next": "14.2.13",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "slugify": "^1.6.6"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

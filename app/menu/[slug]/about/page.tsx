@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const revalidate = 0;
 
@@ -50,7 +51,10 @@ export default async function AboutPage({ params }: { params: { slug: string } }
   const hasInfo = restaurant.address || restaurant.phone || restaurant.workingHours;
 
   return (
-    <main className="min-h-screen bg-paper">
+    <main className="relative min-h-screen bg-paper">
+      <div className="fixed top-4 left-4 z-20">
+        <ThemeToggle />
+      </div>
       <header className="border-b border-ink/10 px-6 pt-12 pb-8 text-center">
         {restaurant.logoUrl ? (
           <img

@@ -23,10 +23,21 @@ async function parseResponse(res: Response) {
   }
 }
 
+const SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/[\s-]+/g, "-");
+}
+
 export default function RestaurantSettings({ restaurant }: { restaurant: RestaurantInfo }) {
   const router = useRouter();
   const { toast, showToast, dismissToast } = useToast();
   const [name, setName] = useState(restaurant.name);
+  const [slug, setSlug] = useState(restaurant.slug);
   const [description, setDescription] = useState(restaurant.description ?? "");
   const [phone, setPhone] = useState(restaurant.phone ?? "");
   const [address, setAddress] = useState(restaurant.address ?? "");
@@ -36,6 +47,7 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [saving, setSaving] = useState(false);
   const [nameError, setNameError] = useState("");
+  const [slugError, setSlugError] = useState("");
 
   async function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -55,16 +67,29 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    let hasError = false;
     if (!name.trim()) {
       setNameError("نام رستوران/کافه الزامی است");
-      return;
+      hasError = true;
+    } else {
+      setNameError("");
     }
-    setNameError("");
+    if (!slug.trim()) {
+      setSlugError("آدرس منو الزامی است");
+      hasError = true;
+    } else if (!SLUG_RE.test(slug.trim())) {
+      setSlugError("فقط حروف انگلیسی کوچک، عدد و خط تیره مجاز است");
+      hasError = true;
+    } else {
+      setSlugError("");
+    }
+    if (hasError) return;
+
     setSaving(true);
     const res = await fetch("/api/restaurant", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, description, phone, address, workingHours, locationUrl, logoUrl }),
+      body: JSON.stringify({ name, slug, description, phone, address, workingHours, locationUrl, logoUrl }),
     });
     const data = await parseResponse(res);
     setSaving(false);
@@ -116,6 +141,30 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
             }`}
           />
           {nameError && <p className="text-wine text-xs mt-1.5">{nameError}</p>}
+        </div>
+
+        <div>
+          <label className="block text-sm text-ink mb-1.5 font-medium">آدرس انگلیسی منو</label>
+          <div
+            className={`flex items-center border rounded-md bg-white overflow-hidden focus-within:ring-2 transition-shadow ${
+              slugError ? "border-wine ring-wine/20" : "border-ink/20 focus-within:ring-gold/40"
+            }`}
+          >
+            <span className="text-muted text-sm pe-2 ps-3 border-e border-ink/10 whitespace-nowrap" dir="ltr">
+              menu.app/
+            </span>
+            <input
+              type="text"
+              dir="ltr"
+              value={slug}
+              onChange={(e) => {
+                setSlug(slugify(e.target.value));
+                if (slugError) setSlugError("");
+              }}
+              className="flex-1 min-w-0 px-3 py-2 text-left focus:outline-none"
+            />
+          </div>
+          {slugError && <p className="text-wine text-xs mt-1.5">{slugError}</p>}
         </div>
 
         <div>

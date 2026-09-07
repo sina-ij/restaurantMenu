@@ -1,4 +1,5 @@
-import { getCurrentRestaurant } from "@/lib/getCurrentRestaurant";
+import { getCurrentSession, getCurrentRestaurant } from "@/lib/getCurrentRestaurant";
+import { redirect } from "next/navigation";
 import AdminChrome from "@/components/AdminChrome";
 import RestaurantOnboarding from "@/components/RestaurantOnboarding";
 
@@ -9,6 +10,10 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getCurrentSession();
+  if (!session) redirect("/admin/login");
+  if (session.role === "SUPER_ADMIN") redirect("/admin/super");
+
   const restaurant = await getCurrentRestaurant();
 
   return (
