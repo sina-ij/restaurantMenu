@@ -35,7 +35,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "دسترسی ندارید" }, { status: 403 });
   }
 
-  let body: { email?: string; password?: string; restaurantName?: string; slug?: string };
+  let body: {
+    email?: string;
+    password?: string;
+    restaurantName?: string;
+    slug?: string;
+    businessType?: string;
+  };
   try {
     body = await req.json();
   } catch {
@@ -85,7 +91,9 @@ export async function POST(req: NextRequest) {
         email,
         passwordHash,
         role: "OWNER",
-        restaurant: { create: { name: restaurantName, slug } },
+        restaurant: {
+          create: { name: restaurantName, slug, businessType: body.businessType?.trim() || null },
+        },
       },
       include: { restaurant: true },
     });

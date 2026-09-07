@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Toast, useToast } from "@/components/Toast";
+import { BUSINESS_TYPES } from "@/lib/color";
 
 const SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
@@ -28,6 +29,7 @@ export default function RestaurantOnboarding() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
+  const [businessType, setBusinessType] = useState("");
   const [slugTouched, setSlugTouched] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<Field, string>>>({});
   const [loading, setLoading] = useState(false);
@@ -59,7 +61,7 @@ export default function RestaurantOnboarding() {
       const res = await fetch("/api/restaurant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, slug }),
+        body: JSON.stringify({ name, slug, businessType }),
       });
       const data = await parseResponse(res);
 
@@ -78,7 +80,7 @@ export default function RestaurantOnboarding() {
   }
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center px-4 py-10">
+    <div className="relative min-h-[70vh] flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm">
         <h1 className="font-display font-semibold text-2xl text-ink mb-2 text-center">
           بساز رستوران/کافه‌ت رو
@@ -107,6 +109,22 @@ export default function RestaurantOnboarding() {
           </div>
 
           <div>
+            <label className="block text-sm text-ink mb-1.5 font-medium">نوع کسب‌وکار (اختیاری)</label>
+            <select
+              value={businessType}
+              onChange={(e) => setBusinessType(e.target.value)}
+              className="w-full border border-ink/20 rounded-md px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
+            >
+              <option value="">انتخاب کنید</option>
+              {BUSINESS_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
             <label className="block text-sm text-ink mb-1.5 font-medium">آدرس انگلیسی منو</label>
             <div
               className={`flex items-center border rounded-md bg-white overflow-hidden focus-within:ring-2 transition-shadow ${
@@ -125,7 +143,7 @@ export default function RestaurantOnboarding() {
                   setSlug(slugify(e.target.value));
                 }}
                 placeholder="golestan-cafe"
-                className="flex-1 min-w-0 px-3 py-2.5 text-left focus:outline-none"
+                className="flex-1 min-w-0 px-3 py-2.5 bg-white text-left focus:outline-none"
               />
             </div>
             {fieldErrors.slug && <p className="text-wine text-xs mt-1.5">{fieldErrors.slug}</p>}

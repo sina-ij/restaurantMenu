@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { BackgroundPattern } from "@/components/BackgroundPattern";
 
 function MenuIcon() {
   return (
@@ -88,13 +89,15 @@ export default function AdminChrome({
   const navItems = restaurant
     ? [
         { href: "/admin/dashboard", label: "منو و دسته‌بندی‌ها" },
+        { href: "/admin/dashboard/stats", label: "آمار بازدید" },
         { href: "/admin/dashboard/settings", label: "اطلاعات کافه" },
       ]
     : [];
 
   return (
-    <div className="min-h-screen bg-paper">
-      <header className="sticky top-0 z-20 bg-paper/95 backdrop-blur border-b border-ink/10">
+    <div className="relative min-h-screen bg-paper">
+      <BackgroundPattern opacity={0.35} />
+      <header className="relative sticky top-0 z-20 bg-paper/95 backdrop-blur border-b border-ink/10">
         <div className="flex items-center justify-between px-4 py-3 md:px-8">
           <div className="flex items-center gap-3">
             <button

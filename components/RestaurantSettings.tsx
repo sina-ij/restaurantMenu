@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Toast, useToast } from "@/components/Toast";
+import { AccentColorPicker } from "@/components/AccentColorPicker";
+import { BUSINESS_TYPES } from "@/lib/color";
 
 export type RestaurantInfo = {
   name: string;
@@ -13,6 +15,8 @@ export type RestaurantInfo = {
   address: string | null;
   workingHours: string | null;
   locationUrl: string | null;
+  businessType: string | null;
+  accentColor: string;
 };
 
 async function parseResponse(res: Response) {
@@ -44,6 +48,8 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
   const [workingHours, setWorkingHours] = useState(restaurant.workingHours ?? "");
   const [locationUrl, setLocationUrl] = useState(restaurant.locationUrl ?? "");
   const [logoUrl, setLogoUrl] = useState(restaurant.logoUrl ?? "");
+  const [businessType, setBusinessType] = useState(restaurant.businessType ?? "");
+  const [accentColor, setAccentColor] = useState(restaurant.accentColor);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [saving, setSaving] = useState(false);
   const [nameError, setNameError] = useState("");
@@ -89,7 +95,18 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
     const res = await fetch("/api/restaurant", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, slug, description, phone, address, workingHours, locationUrl, logoUrl }),
+      body: JSON.stringify({
+        name,
+        slug,
+        description,
+        phone,
+        address,
+        workingHours,
+        locationUrl,
+        logoUrl,
+        businessType,
+        accentColor,
+      }),
     });
     const data = await parseResponse(res);
     setSaving(false);
@@ -102,7 +119,7 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
   }
 
   return (
-    <main className="px-4 py-8 md:px-10 max-w-2xl mx-auto">
+    <main className="relative px-4 py-8 md:px-10 max-w-2xl mx-auto">
       <h1 className="font-display font-semibold text-2xl text-ink mb-8">اطلاعات کافه</h1>
 
       <form
@@ -144,6 +161,27 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
         </div>
 
         <div>
+          <label className="block text-sm text-ink mb-1.5 font-medium">نوع کسب‌وکار</label>
+          <select
+            value={businessType}
+            onChange={(e) => setBusinessType(e.target.value)}
+            className="w-full border border-ink/20 rounded-md px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
+          >
+            <option value="">انتخاب کنید</option>
+            {BUSINESS_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm text-ink mb-1.5 font-medium">رنگ اختصاصی منو</label>
+          <AccentColorPicker value={accentColor} onChange={setAccentColor} />
+        </div>
+
+        <div>
           <label className="block text-sm text-ink mb-1.5 font-medium">آدرس انگلیسی منو</label>
           <div
             className={`flex items-center border rounded-md bg-white overflow-hidden focus-within:ring-2 transition-shadow ${
@@ -161,7 +199,7 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
                 setSlug(slugify(e.target.value));
                 if (slugError) setSlugError("");
               }}
-              className="flex-1 min-w-0 px-3 py-2 text-left focus:outline-none"
+              className="flex-1 min-w-0 px-3 py-2 bg-white text-left focus:outline-none"
             />
           </div>
           {slugError && <p className="text-wine text-xs mt-1.5">{slugError}</p>}

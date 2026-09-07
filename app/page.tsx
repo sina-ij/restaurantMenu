@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BackgroundPattern } from "@/components/BackgroundPattern";
 
 function Divider() {
   return (
@@ -36,14 +37,7 @@ const features = [
 export default function Home() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-paper flex flex-col justify-center">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-60"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(45deg, rgba(34,26,19,0.04) 0, rgba(34,26,19,0.04) 1px, transparent 1px, transparent 18px), repeating-linear-gradient(-45deg, rgba(34,26,19,0.04) 0, rgba(34,26,19,0.04) 1px, transparent 1px, transparent 18px)",
-        }}
-        aria-hidden="true"
-      />
+      <BackgroundPattern />
       <div
         className="pointer-events-none absolute -top-24 -right-16 h-72 w-72 rounded-full bg-gold/20 blur-3xl"
         aria-hidden="true"

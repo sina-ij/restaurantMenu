@@ -32,11 +32,24 @@ model Restaurant {
   address      String?
   workingHours String?
   locationUrl  String?
-  accentColor  String     @default("#C98A2C")
+  businessType String?
+  accentColor  String     @default("#AB7C33")
+  viewCount    Int        @default(0)
   owner        User       @relation(fields: [ownerId], references: [id])
   ownerId      String     @unique
   categories   Category[]
+  dailyStats   DailyStat[]
   createdAt    DateTime   @default(now())
+}
+
+model DailyStat {
+  id           String     @id @default(cuid())
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId String
+  day          DateTime
+  count        Int        @default(0)
+
+  @@unique([restaurantId, day])
 }
 
 model Category {

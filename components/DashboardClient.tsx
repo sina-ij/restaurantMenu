@@ -168,7 +168,7 @@ export default function DashboardClient({
   }
 
   return (
-    <main className="px-4 py-8 md:px-10 max-w-3xl mx-auto">
+    <main className="relative px-4 py-8 md:px-10 max-w-3xl mx-auto">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-ink/10">
         <div>
           <h1 className="font-display font-semibold text-2xl text-ink">منو و دسته‌بندی‌ها</h1>

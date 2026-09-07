@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Toast, useToast } from "@/components/Toast";
+import { BUSINESS_TYPES } from "@/lib/color";
 
 type Owner = {
   id: string;
@@ -35,6 +36,7 @@ export default function SuperAdminPanel() {
   const [restaurantName, setRestaurantName] = useState("");
   const [slug, setSlug] = useState("");
   const [slugTouched, setSlugTouched] = useState(false);
+  const [businessType, setBusinessType] = useState("");
   const [creating, setCreating] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
@@ -72,7 +74,7 @@ export default function SuperAdminPanel() {
     const res = await fetch("/api/super/owners", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, restaurantName, slug }),
+      body: JSON.stringify({ email, password, restaurantName, slug, businessType }),
     });
     const data = await parseResponse(res);
     setCreating(false);
@@ -84,6 +86,7 @@ export default function SuperAdminPanel() {
       setRestaurantName("");
       setSlug("");
       setSlugTouched(false);
+      setBusinessType("");
       loadOwners();
     } else {
       showToast(data.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید", "error");
@@ -105,7 +108,7 @@ export default function SuperAdminPanel() {
   }
 
   return (
-    <main className="px-4 py-8 md:px-10 max-w-3xl mx-auto">
+    <main className="relative px-4 py-8 md:px-10 max-w-3xl mx-auto">
       <h1 className="font-display font-semibold text-2xl text-ink mb-8">مدیریت رستوران‌دارها</h1>
 
       <form
@@ -132,6 +135,22 @@ export default function SuperAdminPanel() {
         </div>
 
         <div>
+          <label className="block text-sm text-ink mb-1.5 font-medium">نوع کسب‌وکار (اختیاری)</label>
+          <select
+            value={businessType}
+            onChange={(e) => setBusinessType(e.target.value)}
+            className="w-full border border-ink/20 rounded-md px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
+          >
+            <option value="">انتخاب کنید</option>
+            {BUSINESS_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
           <label className="block text-sm text-ink mb-1.5 font-medium">آدرس انگلیسی منو</label>
           <div
             className={`flex items-center border rounded-md bg-white overflow-hidden focus-within:ring-2 transition-shadow ${
@@ -150,7 +169,7 @@ export default function SuperAdminPanel() {
                 setSlug(slugify(e.target.value));
               }}
               placeholder="golestan-cafe"
-              className="flex-1 min-w-0 px-3 py-2 text-left focus:outline-none"
+              className="flex-1 min-w-0 px-3 py-2 bg-white text-left focus:outline-none"
             />
           </div>
           {fieldErrors.slug && <p className="text-wine text-xs mt-1.5">{fieldErrors.slug}</p>}

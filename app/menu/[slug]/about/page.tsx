@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { BackgroundPattern } from "@/components/BackgroundPattern";
+import { hexToRgbTriplet } from "@/lib/color";
 
 export const revalidate = 0;
 
@@ -51,11 +53,15 @@ export default async function AboutPage({ params }: { params: { slug: string } }
   const hasInfo = restaurant.address || restaurant.phone || restaurant.workingHours;
 
   return (
-    <main className="relative min-h-screen bg-paper">
+    <main
+      className="relative min-h-screen bg-paper"
+      style={{ "--color-gold": hexToRgbTriplet(restaurant.accentColor) } as React.CSSProperties}
+    >
+      <BackgroundPattern opacity={0.5} />
       <div className="fixed top-4 left-4 z-20">
         <ThemeToggle />
       </div>
-      <header className="border-b border-ink/10 px-6 pt-12 pb-8 text-center">
+      <header className="relative border-b border-ink/10 px-6 pt-12 pb-8 text-center">
         {restaurant.logoUrl ? (
           <img
             src={restaurant.logoUrl}
@@ -69,11 +75,16 @@ export default async function AboutPage({ params }: { params: { slug: string } }
             <span className="h-px w-8 bg-gold/40" />
           </div>
         )}
+        {restaurant.businessType && (
+          <span className="inline-block text-xs px-3 py-1 rounded-full border border-gold/40 text-gold mb-2">
+            {restaurant.businessType}
+          </span>
+        )}
         <h1 className="font-display font-semibold text-3xl text-ink">{restaurant.name}</h1>
         <p className="text-muted mt-2 text-sm">درباره ما</p>
       </header>
 
-      <div className="max-w-md mx-auto px-4 py-10">
+      <div className="relative max-w-md mx-auto px-4 py-10">
         {restaurant.description && (
           <p className="text-ink/90 leading-relaxed mb-8 text-center">{restaurant.description}</p>
         )}

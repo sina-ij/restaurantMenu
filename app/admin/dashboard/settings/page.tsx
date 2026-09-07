@@ -19,6 +19,8 @@ export default async function SettingsPage() {
         address: restaurant.address,
         workingHours: restaurant.workingHours,
         locationUrl: restaurant.locationUrl,
+        businessType: restaurant.businessType,
+        accentColor: restaurant.accentColor,
       }}
     />
   );

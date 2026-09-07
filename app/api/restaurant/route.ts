@@ -4,6 +4,7 @@ import { getCurrentRestaurant, getCurrentUserId } from "@/lib/getCurrentRestaura
 import { toApiError } from "@/lib/apiError";
 
 const SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+const HEX_RE = /^#[0-9a-fA-F]{6}$/;
 
 export async function POST(req: NextRequest) {
   const userId = await getCurrentUserId();
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "شما قبلاً یک رستوران/کافه ساخته‌اید" }, { status: 409 });
   }
 
-  let body: { name?: string; slug?: string };
+  let body: { name?: string; slug?: string; businessType?: string };
   try {
     body = await req.json();
   } catch {
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
     }
 
     const restaurant = await prisma.restaurant.create({
-      data: { name, slug, ownerId: userId },
+      data: { name, slug, businessType: body.businessType?.trim() || null, ownerId: userId },
     });
     return NextResponse.json(restaurant);
   } catch (err) {
@@ -74,6 +75,8 @@ export async function PUT(req: NextRequest) {
     workingHours?: string;
     locationUrl?: string;
     logoUrl?: string;
+    businessType?: string;
+    accentColor?: string;
   };
   try {
     body = await req.json();
@@ -83,6 +86,9 @@ export async function PUT(req: NextRequest) {
 
   if (body.name !== undefined && !body.name.trim()) {
     return NextResponse.json({ error: "نام رستوران/کافه الزامی است" }, { status: 400 });
+  }
+  if (body.accentColor !== undefined && !HEX_RE.test(body.accentColor)) {
+    return NextResponse.json({ error: "رنگ انتخابی معتبر نیست" }, { status: 400 });
   }
 
   let slug = restaurant.slug;
@@ -121,6 +127,8 @@ export async function PUT(req: NextRequest) {
         workingHours: body.workingHours?.trim() || null,
         locationUrl: body.locationUrl?.trim() || null,
         logoUrl: body.logoUrl !== undefined ? body.logoUrl || null : restaurant.logoUrl,
+        businessType: body.businessType?.trim() || null,
+        accentColor: body.accentColor ?? restaurant.accentColor,
       },
     });
     return NextResponse.json(updated);

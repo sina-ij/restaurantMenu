@@ -2,11 +2,32 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { BackgroundPattern } from "@/components/BackgroundPattern";
+import { MenuItemCard } from "@/components/MenuItemCard";
+import { hexToRgbTriplet } from "@/lib/color";
 
 export const revalidate = 0;
 
-function formatPrice(price: number) {
-  return new Intl.NumberFormat("fa-IR").format(price);
+async function trackView(restaurantId: string) {
+  try {
+    const now = new Date();
+    const day = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    await prisma.restaurant.update({
+      where: { id: restaurantId },
+      data: {
+        viewCount: { increment: 1 },
+        dailyStats: {
+          upsert: {
+            where: { restaurantId_day: { restaurantId, day } },
+            create: { day, count: 1 },
+            update: { count: { increment: 1 } },
+          },
+        },
+      },
+    });
+  } catch (err) {
+    console.error("track view error:", err);
+  }
 }
 
 export default async function PublicMenuPage({
@@ -31,16 +52,22 @@ export default async function PublicMenuPage({
 
   if (!restaurant) return notFound();
 
+  await trackView(restaurant.id);
+
   const categoriesWithItems = restaurant.categories.filter(
     (c) => c.items.length > 0
   );
 
   return (
-    <main className="relative min-h-screen bg-paper">
+    <main
+      className="relative min-h-screen bg-paper"
+      style={{ "--color-gold": hexToRgbTriplet(restaurant.accentColor) } as React.CSSProperties}
+    >
+      <BackgroundPattern opacity={0.5} />
       <div className="fixed top-4 left-4 z-20">
         <ThemeToggle />
       </div>
-      <header className="border-b border-ink/10 px-6 pt-12 pb-8 text-center">
+      <header className="relative border-b border-ink/10 px-6 pt-12 pb-8 text-center">
         {restaurant.logoUrl ? (
           <img
             src={restaurant.logoUrl}
@@ -53,6 +80,11 @@ export default async function PublicMenuPage({
             <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
             <span className="h-px w-8 bg-gold/40" />
           </div>
+        )}
+        {restaurant.businessType && (
+          <span className="inline-block text-xs px-3 py-1 rounded-full border border-gold/40 text-gold mb-2">
+            {restaurant.businessType}
+          </span>
         )}
         <h1 className="font-display font-semibold text-3xl text-ink">{restaurant.name}</h1>
         {restaurant.description && (
@@ -69,7 +101,7 @@ export default async function PublicMenuPage({
       </header>
 
       {categoriesWithItems.length === 0 ? (
-        <p className="text-center text-muted py-20">
+        <p className="relative text-center text-muted py-20">
           منو هنوز آماده نشده، به‌زودی برمی‌گردیم.
         </p>
       ) : (
@@ -86,7 +118,7 @@ export default async function PublicMenuPage({
             ))}
           </nav>
 
-          <div className="max-w-xl mx-auto px-4 py-10 space-y-14">
+          <div className="relative max-w-xl mx-auto px-4 py-10 space-y-14">
             {categoriesWithItems.map((cat) => (
               <section key={cat.id} id={`cat-${cat.id}`} className="scroll-mt-20">
                 <div className="flex items-center gap-3 mb-6">
@@ -101,36 +133,11 @@ export default async function PublicMenuPage({
                     {cat.name}
                   </h2>
                   <span className="h-px flex-1 bg-gradient-to-l from-gold/40 to-transparent" />
+                  <span className="h-1.5 w-1.5 rotate-45 bg-gold/50 flex-shrink-0" aria-hidden="true" />
                 </div>
                 <div className="space-y-5">
                   {cat.items.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex gap-4 items-start bg-card rounded-lg p-3.5 border border-ink/5 shadow-soft"
-                    >
-                      {item.imageUrl && (
-                        <img
-                          src={item.imageUrl}
-                          alt={item.name}
-                          className="w-20 h-20 rounded-md object-cover flex-shrink-0"
-                        />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-baseline gap-3">
-                          <h3 className="font-body font-semibold text-ink">
-                            {item.name}
-                          </h3>
-                          <span className="font-body font-medium text-gold whitespace-nowrap tabular-nums">
-                            {formatPrice(item.price)} تومان
-                          </span>
-                        </div>
-                        {item.description && (
-                          <p className="text-muted text-sm mt-1 leading-relaxed">
-                            {item.description}
-                          </p>
-                        )}
-                      </div>
-                    </div>
+                    <MenuItemCard key={item.id} item={item} />
                   ))}
                 </div>
               </section>
@@ -140,7 +147,7 @@ export default async function PublicMenuPage({
       )}
 
       {restaurant.phone && (
-        <footer className="text-center text-muted text-sm py-8 border-t border-ink/10">
+        <footer className="relative text-center text-muted text-sm py-8 border-t border-ink/10">
           تماس: <span dir="ltr">{restaurant.phone}</span>
         </footer>
       )}
