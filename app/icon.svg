@@ -1,0 +1,13 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="31" fill="#221A13"/>
+  <circle cx="32" cy="32" r="29" fill="none" stroke="#AB7C33" stroke-width="1.5"/>
+  <text
+    x="32"
+    y="45"
+    font-family="Georgia, 'Noto Naskh Arabic', 'Times New Roman', serif"
+    font-size="36"
+    font-weight="700"
+    fill="#FBF6EC"
+    text-anchor="middle"
+  >م</text>
+</svg>

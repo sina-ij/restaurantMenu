@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifySession, COOKIE_NAME } from "./lib/auth";
 
 export async function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname.startsWith("/admin/dashboard")) {
+  if (
+    request.nextUrl.pathname.startsWith("/admin/dashboard") ||
+    request.nextUrl.pathname.startsWith("/admin/super")
+  ) {
     const token = request.cookies.get(COOKIE_NAME)?.value;
     const session = token ? await verifySession(token) : null;
 
@@ -15,5 +18,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/dashboard/:path*"],
+  matcher: ["/admin/dashboard/:path*", "/admin/super/:path*"],
 };

@@ -3,35 +3,59 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  OWNER
 }
 
 model User {
   id           String     @id @default(cuid())
   email        String     @unique
   passwordHash String
+  role         Role       @default(OWNER)
   createdAt    DateTime   @default(now())
   restaurant   Restaurant?
 }
 
 model Restaurant {
-  id          String     @id @default(cuid())
-  slug        String     @unique
-  name        String
-  description String?
-  logoUrl     String?
-  phone       String?
-  accentColor String     @default("#C98A2C")
-  owner       User       @relation(fields: [ownerId], references: [id])
-  ownerId     String     @unique
-  categories  Category[]
-  createdAt   DateTime   @default(now())
+  id           String     @id @default(cuid())
+  slug         String     @unique
+  name         String
+  description  String?
+  logoUrl      String?
+  phone        String?
+  address      String?
+  workingHours String?
+  locationUrl  String?
+  businessType String?
+  accentColor  String     @default("#AB7C33")
+  viewCount    Int        @default(0)
+  owner        User       @relation(fields: [ownerId], references: [id])
+  ownerId      String     @unique
+  categories   Category[]
+  dailyStats   DailyStat[]
+  createdAt    DateTime   @default(now())
+}
+
+model DailyStat {
+  id           String     @id @default(cuid())
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId String
+  day          DateTime
+  count        Int        @default(0)
+
+  @@unique([restaurantId, day])
 }
 
 model Category {
   id           String     @id @default(cuid())
   name         String
+  imageUrl     String?
   order        Int        @default(0)
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   restaurantId String

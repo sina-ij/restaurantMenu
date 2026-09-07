@@ -1,16 +1,27 @@
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { verifySession, COOKIE_NAME } from "./auth";
 import { prisma } from "./prisma";
 
-export async function getCurrentRestaurant() {
+export const getCurrentSession = cache(async () => {
   const token = cookies().get(COOKIE_NAME)?.value;
   if (!token) return null;
 
   const session = await verifySession(token);
-  if (!session) return null;
+  return session;
+});
+
+export const getCurrentUserId = cache(async () => {
+  const session = await getCurrentSession();
+  return session?.userId ?? null;
+});
+
+export const getCurrentRestaurant = cache(async () => {
+  const userId = await getCurrentUserId();
+  if (!userId) return null;
 
   const restaurant = await prisma.restaurant.findUnique({
-    where: { ownerId: session.userId },
+    where: { ownerId: userId },
   });
   return restaurant;
-}
+});

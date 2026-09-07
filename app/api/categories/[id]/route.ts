@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurant } from "@/lib/getCurrentRestaurant";
+import { toApiError } from "@/lib/apiError";
 
 export async function PUT(
   req: NextRequest,
@@ -16,12 +17,31 @@ export async function PUT(
     return NextResponse.json({ error: "یافت نشد" }, { status: 404 });
   }
 
-  const { name } = await req.json();
-  const updated = await prisma.category.update({
-    where: { id: params.id },
-    data: { name },
-  });
-  return NextResponse.json(updated);
+  let body: { name?: string; imageUrl?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "اطلاعات ارسالی نامعتبر است" }, { status: 400 });
+  }
+
+  if (body.name !== undefined && !body.name.trim()) {
+    return NextResponse.json({ error: "نام دسته الزامی است" }, { status: 400 });
+  }
+
+  try {
+    const updated = await prisma.category.update({
+      where: { id: params.id },
+      data: {
+        name: body.name?.trim() ?? category.name,
+        imageUrl: body.imageUrl !== undefined ? body.imageUrl || null : category.imageUrl,
+      },
+    });
+    return NextResponse.json(updated);
+  } catch (err) {
+    console.error("update category error:", err);
+    const { message, status } = toApiError(err);
+    return NextResponse.json({ error: message }, { status });
+  }
 }
 
 export async function DELETE(
@@ -38,6 +58,12 @@ export async function DELETE(
     return NextResponse.json({ error: "یافت نشد" }, { status: 404 });
   }
 
-  await prisma.category.delete({ where: { id: params.id } });
-  return NextResponse.json({ ok: true });
+  try {
+    await prisma.category.delete({ where: { id: params.id } });
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("delete category error:", err);
+    const { message, status } = toApiError(err);
+    return NextResponse.json({ error: message }, { status });
+  }
 }

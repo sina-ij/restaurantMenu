@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurant } from "@/lib/getCurrentRestaurant";
+import { toApiError } from "@/lib/apiError";
 
 export async function POST(req: NextRequest) {
   const restaurant = await getCurrentRestaurant();
@@ -8,29 +9,55 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "دسترسی ندارید" }, { status: 401 });
   }
 
-  const { name, description, price, imageUrl, categoryId } = await req.json();
+  let body: {
+    name?: string;
+    description?: string;
+    price?: string | number;
+    imageUrl?: string;
+    categoryId?: string;
+  };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "اطلاعات ارسالی نامعتبر است" }, { status: 400 });
+  }
 
-  if (!name || !price || !categoryId) {
+  const { name, description, price, imageUrl, categoryId } = body;
+
+  if (!name?.trim() || !price || !categoryId) {
     return NextResponse.json(
       { error: "نام، قیمت و دسته‌بندی الزامی است" },
       { status: 400 }
     );
   }
 
-  const category = await prisma.category.findUnique({ where: { id: categoryId } });
-  if (!category || category.restaurantId !== restaurant.id) {
-    return NextResponse.json({ error: "دسته‌بندی نامعتبر است" }, { status: 400 });
+  const priceNumber = typeof price === "number" ? price : parseInt(price, 10);
+  if (!Number.isFinite(priceNumber) || priceNumber < 0) {
+    return NextResponse.json({ error: "قیمت باید یک عدد معتبر باشد" }, { status: 400 });
   }
 
-  const item = await prisma.menuItem.create({
-    data: {
-      name,
-      description,
-      price: parseInt(price, 10),
-      imageUrl,
-      categoryId,
-    },
-  });
+  try {
+    const category = await prisma.category.findUnique({ where: { id: categoryId } });
+    if (!category || category.restaurantId !== restaurant.id) {
+      return NextResponse.json({ error: "دسته‌بندی نامعتبر است" }, { status: 400 });
+    }
 
-  return NextResponse.json(item);
+    const count = await prisma.menuItem.count({ where: { categoryId } });
+    const item = await prisma.menuItem.create({
+      data: {
+        name: name.trim(),
+        description: description?.trim() || null,
+        price: priceNumber,
+        imageUrl: imageUrl || null,
+        categoryId,
+        order: count,
+      },
+    });
+
+    return NextResponse.json(item);
+  } catch (err) {
+    console.error("create menu item error:", err);
+    const { message, status } = toApiError(err);
+    return NextResponse.json({ error: message }, { status });
+  }
 }

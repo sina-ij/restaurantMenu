@@ -2,10 +2,98 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-ink: 34 26 19;
+  --color-paper: 251 246 236;
+  --color-card: 255 253 248;
+  --color-gold: 171 124 51;
+  --color-wine: 122 43 51;
+  --color-olive: 95 110 69;
+  --color-muted: 139 128 114;
+}
+
+.dark {
+  --color-ink: 238 231 220;
+  --color-paper: 23 19 16;
+  --color-card: 33 28 24;
+  --color-gold: 216 171 99;
+  --color-wine: 225 122 130;
+  --color-olive: 157 180 124;
+  --color-muted: 158 148 135;
+}
+
 * {
   border-color: theme("colors.ink" / 12%);
 }
 
+html {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
 body {
   min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* اینپوت‌ها و select همیشه پس‌زمینه‌ی روشن (bg-white) دارن، پس متن و placeholder
+   باید مستقل از حالت روز/شب، رنگ ثابت و خوانا داشته باشن */
+input,
+textarea,
+select {
+  color: #221a13;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9a8f80;
+}
+
+::selection {
+  background-color: theme("colors.gold" / 25%);
+  color: theme("colors.ink");
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: theme("colors.ink" / 15%);
+  border-radius: 999px;
+  border: 2px solid theme("colors.paper");
+}
+
+input,
+textarea {
+  font-family: inherit;
+}
+
+/* حذف تقویم/فلش پیش‌فرض مرورگر روی input های عددی برای ظاهر یکدست‌تر */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  margin: 0;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-toast-in {
+  animation: toast-in 0.2s ease-out;
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurant } from "@/lib/getCurrentRestaurant";
+import { toApiError } from "@/lib/apiError";
 
 export async function POST(req: NextRequest) {
   const restaurant = await getCurrentRestaurant();
@@ -8,14 +9,31 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "دسترسی ندارید" }, { status: 401 });
   }
 
-  const { name } = await req.json();
-  if (!name || !name.trim()) {
+  let body: { name?: string; imageUrl?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "اطلاعات ارسالی نامعتبر است" }, { status: 400 });
+  }
+
+  if (!body.name || !body.name.trim()) {
     return NextResponse.json({ error: "نام دسته الزامی است" }, { status: 400 });
   }
 
-  const category = await prisma.category.create({
-    data: { name: name.trim(), restaurantId: restaurant.id },
-  });
-
-  return NextResponse.json(category);
+  try {
+    const count = await prisma.category.count({ where: { restaurantId: restaurant.id } });
+    const category = await prisma.category.create({
+      data: {
+        name: body.name.trim(),
+        imageUrl: body.imageUrl || null,
+        restaurantId: restaurant.id,
+        order: count,
+      },
+    });
+    return NextResponse.json(category);
+  } catch (err) {
+    console.error("create category error:", err);
+    const { message, status } = toApiError(err);
+    return NextResponse.json({ error: message }, { status });
+  }
 }
