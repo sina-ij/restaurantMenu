@@ -41,10 +41,11 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* اینپوت‌ها همیشه پس‌زمینه‌ی روشن (bg-white) دارن، پس متن و placeholder
+/* اینپوت‌ها و select همیشه پس‌زمینه‌ی روشن (bg-white) دارن، پس متن و placeholder
    باید مستقل از حالت روز/شب، رنگ ثابت و خوانا داشته باشن */
 input,
-textarea {
+textarea,
+select {
   color: #221a13;
 }
 

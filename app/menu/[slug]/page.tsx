@@ -111,7 +111,7 @@ export default async function PublicMenuPage({
               <a
                 key={cat.id}
                 href={`#cat-${cat.id}`}
-                className="text-sm px-4 py-1.5 rounded-full border border-ink/15 text-ink hover:bg-ink hover:text-paper transition-colors font-medium"
+                className="text-sm px-4 py-1.5 rounded-full border border-ink/15 text-ink hover:bg-gold hover:border-gold hover:text-paper transition-colors font-medium"
               >
                 {cat.name}
               </a>
