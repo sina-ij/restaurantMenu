@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
-    "seed:super-admin": "node prisma/seed-super-admin.js"
+    "seed:super-admin": "node prisma/seed-super-admin.js",
+    "seed:demo": "node prisma/seed-demo-data.js"
   },
   "prisma": {
     "seed": "node prisma/seed-super-admin.js"
