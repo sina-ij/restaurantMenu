@@ -99,6 +99,21 @@ export default function DashboardClient({
     }
   }
 
+  async function renameCategory(id: string, name: string): Promise<{ ok: boolean; error?: string }> {
+    const res = await fetch(`/api/categories/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+    const data = await parseResponse(res);
+    if (res.ok) {
+      setCategories(categories.map((c) => (c.id === id ? { ...c, name: data.name } : c)));
+      showToast("نام دسته بروزرسانی شد", "success");
+      return { ok: true };
+    }
+    return { ok: false, error: data.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید" };
+  }
+
   async function updateCategoryImage(categoryId: string, imageUrl: string) {
     const res = await fetch(`/api/categories/${categoryId}`, {
       method: "PUT",
@@ -131,6 +146,31 @@ export default function DashboardClient({
         )
       );
       showToast("آیتم اضافه شد", "success");
+      return { ok: true };
+    }
+    return { ok: false, error: data.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید" };
+  }
+
+  async function updateItem(
+    itemId: string,
+    categoryId: string,
+    item: { name: string; description: string; price: string; imageUrl: string }
+  ): Promise<{ ok: boolean; error?: string }> {
+    const res = await fetch(`/api/menu-items/${itemId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(item),
+    });
+    const data = await parseResponse(res);
+    if (res.ok) {
+      setCategories(
+        categories.map((c) =>
+          c.id === categoryId
+            ? { ...c, items: c.items.map((i) => (i.id === itemId ? data : i)) }
+            : c
+        )
+      );
+      showToast("آیتم بروزرسانی شد", "success");
       return { ok: true };
     }
     return { ok: false, error: data.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید" };
@@ -310,10 +350,12 @@ export default function DashboardClient({
                   key={cat.id}
                   category={cat}
                   onAddItem={addItem}
+                  onEditItem={updateItem}
                   onToggle={toggleAvailable}
                   onDeleteItem={deleteItem}
                   onDeleteCategory={deleteCategory}
                   onUpdateImage={updateCategoryImage}
+                  onRenameCategory={renameCategory}
                   onReorderItems={reorderItems}
                   sensors={sensors}
                   showToast={showToast}
@@ -361,6 +403,19 @@ function QrIcon() {
   );
 }
 
+function PencilIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-4 w-4">
+      <path
+        strokeWidth={1.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="m16.5 4.5 3 3L8 19H5v-3L16.5 4.5Z"
+      />
+    </svg>
+  );
+}
+
 function GripIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
@@ -404,10 +459,12 @@ function SortableCategoryBlock(
 function CategoryBlock({
   category,
   onAddItem,
+  onEditItem,
   onToggle,
   onDeleteItem,
   onDeleteCategory,
   onUpdateImage,
+  onRenameCategory,
   onReorderItems,
   sensors,
   showToast,
@@ -419,10 +476,16 @@ function CategoryBlock({
     categoryId: string,
     item: { name: string; description: string; price: string; imageUrl: string }
   ) => Promise<{ ok: boolean; error?: string }>;
+  onEditItem: (
+    itemId: string,
+    categoryId: string,
+    item: { name: string; description: string; price: string; imageUrl: string }
+  ) => Promise<{ ok: boolean; error?: string }>;
   onToggle: (item: MenuItem, categoryId: string) => void;
   onDeleteItem: (itemId: string, categoryId: string) => void;
   onDeleteCategory: (id: string) => void;
   onUpdateImage: (categoryId: string, imageUrl: string) => void;
+  onRenameCategory: (id: string, name: string) => Promise<{ ok: boolean; error?: string }>;
   onReorderItems: (categoryId: string, oldIndex: number, newIndex: number) => void;
   sensors: ReturnType<typeof useSensors>;
   showToast: (message: string, type?: "success" | "error") => void;
@@ -438,6 +501,23 @@ function CategoryBlock({
   const [uploadingCategoryImage, setUploadingCategoryImage] = useState(false);
   const [saving, setSaving] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{ name?: string; price?: string }>({});
+  const [editingName, setEditingName] = useState(false);
+  const [nameDraft, setNameDraft] = useState(category.name);
+  const [savingName, setSavingName] = useState(false);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+
+  async function handleRenameSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!nameDraft.trim()) return;
+    setSavingName(true);
+    const result = await onRenameCategory(category.id, nameDraft.trim());
+    setSavingName(false);
+    if (result.ok) {
+      setEditingName(false);
+    } else {
+      showToast(result.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید", "error");
+    }
+  }
 
   async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -533,7 +613,49 @@ function CategoryBlock({
             )}
             <input type="file" accept="image/*" onChange={handleCategoryImageChange} className="hidden" />
           </label>
-          <h2 className="font-display font-semibold text-xl text-ink">{category.name}</h2>
+          {editingName ? (
+            <form onSubmit={handleRenameSubmit} className="flex items-center gap-2">
+              <input
+                type="text"
+                autoFocus
+                value={nameDraft}
+                onChange={(e) => setNameDraft(e.target.value)}
+                className="border border-ink/20 rounded-md px-2 py-1 bg-white text-xl font-display font-semibold focus:outline-none focus:ring-2 focus:ring-gold/40"
+              />
+              <button
+                type="submit"
+                disabled={savingName}
+                className="text-xs text-gold hover:underline font-medium disabled:opacity-60"
+              >
+                ذخیره
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingName(false);
+                  setNameDraft(category.name);
+                }}
+                className="text-xs text-muted hover:text-ink"
+              >
+                انصراف
+              </button>
+            </form>
+          ) : (
+            <div className="flex items-center gap-2">
+              <h2 className="font-display font-semibold text-xl text-ink">{category.name}</h2>
+              <button
+                type="button"
+                onClick={() => {
+                  setNameDraft(category.name);
+                  setEditingName(true);
+                }}
+                className="text-muted hover:text-gold transition-colors"
+                aria-label="ویرایش نام دسته"
+              >
+                <PencilIcon />
+              </button>
+            </div>
+          )}
           {uploadingCategoryImage && <span className="text-xs text-muted">در حال آپلود...</span>}
         </div>
         <div className="flex gap-3 items-center">
@@ -620,14 +742,26 @@ function CategoryBlock({
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleItemDragEnd}>
           <SortableContext items={category.items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
             <ul className="divide-y divide-ink/10">
-              {category.items.map((item) => (
-                <SortableItemRow
-                  key={item.id}
-                  item={item}
-                  onToggle={() => onToggle(item, category.id)}
-                  onDelete={() => onDeleteItem(item.id, category.id)}
-                />
-              ))}
+              {category.items.map((item) =>
+                editingItemId === item.id ? (
+                  <li key={item.id} className="py-3">
+                    <ItemEditForm
+                      item={item}
+                      onSave={(data) => onEditItem(item.id, category.id, data)}
+                      onCancel={() => setEditingItemId(null)}
+                      showToast={showToast}
+                    />
+                  </li>
+                ) : (
+                  <SortableItemRow
+                    key={item.id}
+                    item={item}
+                    onToggle={() => onToggle(item, category.id)}
+                    onEdit={() => setEditingItemId(item.id)}
+                    onDelete={() => onDeleteItem(item.id, category.id)}
+                  />
+                )
+              )}
             </ul>
           </SortableContext>
         </DndContext>
@@ -639,10 +773,12 @@ function CategoryBlock({
 function SortableItemRow({
   item,
   onToggle,
+  onEdit,
   onDelete,
 }: {
   item: MenuItem;
   onToggle: () => void;
+  onEdit: () => void;
   onDelete: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -686,6 +822,13 @@ function SortableItemRow({
         {item.available ? "موجود" : "ناموجود"}
       </button>
       <button
+        onClick={onEdit}
+        className="text-muted hover:text-gold transition-colors"
+        aria-label="ویرایش آیتم"
+      >
+        <PencilIcon />
+      </button>
+      <button
         onClick={onDelete}
         className="text-muted hover:text-wine transition-colors"
         aria-label="حذف آیتم"
@@ -693,5 +836,143 @@ function SortableItemRow({
         <TrashIcon />
       </button>
     </li>
+  );
+}
+
+function ItemEditForm({
+  item,
+  onSave,
+  onCancel,
+  showToast,
+}: {
+  item: MenuItem;
+  onSave: (data: {
+    name: string;
+    description: string;
+    price: string;
+    imageUrl: string;
+  }) => Promise<{ ok: boolean; error?: string }>;
+  onCancel: () => void;
+  showToast: (message: string, type?: "success" | "error") => void;
+}) {
+  const [name, setName] = useState(item.name);
+  const [description, setDescription] = useState(item.description ?? "");
+  const [price, setPrice] = useState(String(item.price));
+  const [imageUrl, setImageUrl] = useState(item.imageUrl ?? "");
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<{ name?: string; price?: string }>({});
+
+  async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/upload", { method: "POST", body: formData });
+    const data = await parseResponse(res);
+    setUploading(false);
+    if (res.ok) {
+      setImageUrl(data.url);
+    } else {
+      showToast(data.error || "آپلود عکس با خطا مواجه شد", "error");
+    }
+  }
+
+  function validate() {
+    const errors: { name?: string; price?: string } = {};
+    if (!name.trim()) errors.name = "نام آیتم را وارد کنید";
+    const priceNum = Number(price);
+    if (!price) {
+      errors.price = "قیمت را وارد کنید";
+    } else if (!Number.isFinite(priceNum) || priceNum < 0) {
+      errors.price = "قیمت باید یک عدد معتبر باشد";
+    }
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!validate()) return;
+    setSaving(true);
+    const result = await onSave({ name: name.trim(), description: description.trim(), price, imageUrl });
+    setSaving(false);
+    if (result.ok) {
+      onCancel();
+    } else {
+      showToast(result.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید", "error");
+    }
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      noValidate
+      className="bg-paper border border-ink/10 rounded-lg p-4 space-y-3"
+    >
+      <div>
+        <input
+          type="text"
+          placeholder="نام آیتم"
+          value={name}
+          onChange={(e) => {
+            setName(e.target.value);
+            if (fieldErrors.name) setFieldErrors({ ...fieldErrors, name: undefined });
+          }}
+          className={`w-full border rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 transition-shadow ${
+            fieldErrors.name ? "border-wine ring-wine/20" : "border-ink/20 focus:ring-gold/40"
+          }`}
+        />
+        {fieldErrors.name && <p className="text-wine text-xs mt-1">{fieldErrors.name}</p>}
+      </div>
+      <textarea
+        placeholder="توضیحات (اختیاری)"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        rows={2}
+        className="w-full border border-ink/20 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
+      />
+      <div>
+        <input
+          type="number"
+          placeholder="قیمت (تومان)"
+          value={price}
+          onChange={(e) => {
+            setPrice(e.target.value);
+            if (fieldErrors.price) setFieldErrors({ ...fieldErrors, price: undefined });
+          }}
+          min={0}
+          className={`w-full border rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 transition-shadow ${
+            fieldErrors.price ? "border-wine ring-wine/20" : "border-ink/20 focus:ring-gold/40"
+          }`}
+        />
+        {fieldErrors.price && <p className="text-wine text-xs mt-1">{fieldErrors.price}</p>}
+      </div>
+      <div>
+        <input type="file" accept="image/*" onChange={handleImageChange} className="text-sm" />
+        {uploading && <p className="text-sm text-muted mt-1">در حال آپلود...</p>}
+        {imageUrl && (
+          <img src={imageUrl} alt="پیش‌نمایش" className="w-16 h-16 rounded-md object-cover mt-2" />
+        )}
+      </div>
+
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          disabled={saving}
+          className="bg-ink text-paper px-5 py-2 rounded-md hover:bg-ink/90 transition-colors disabled:opacity-60"
+        >
+          {saving ? "در حال ذخیره..." : "ذخیره تغییرات"}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="text-sm text-muted hover:text-ink px-3"
+        >
+          انصراف
+        </button>
+      </div>
+    </form>
   );
 }
