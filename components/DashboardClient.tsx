@@ -1,7 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Toast, useToast } from "@/components/Toast";
+import { downloadMenuQrCode } from "@/lib/qrDownload";
 
 type MenuItem = {
   id: string;
@@ -38,7 +54,9 @@ export default function DashboardClient({
   const [newCategoryName, setNewCategoryName] = useState("");
   const [categoryError, setCategoryError] = useState("");
   const [menuUrl, setMenuUrl] = useState("");
+  const [generatingQr, setGeneratingQr] = useState(false);
   const { toast, showToast, dismissToast } = useToast();
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
   useState(() => {
     if (typeof window !== "undefined") {
@@ -161,10 +179,71 @@ export default function DashboardClient({
     }
   }
 
+  async function persistCategoryOrder(ids: string[]) {
+    const res = await fetch("/api/categories/reorder", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids }),
+    });
+    if (!res.ok) {
+      const data = await parseResponse(res);
+      showToast(data.error || "ترتیب دسته‌ها ذخیره نشد", "error");
+      setCategories(initialCategories);
+    }
+  }
+
+  function handleCategoryDragEnd(e: DragEndEvent) {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    setCategories((current) => {
+      const oldIndex = current.findIndex((c) => c.id === active.id);
+      const newIndex = current.findIndex((c) => c.id === over.id);
+      const reordered = arrayMove(current, oldIndex, newIndex);
+      persistCategoryOrder(reordered.map((c) => c.id));
+      return reordered;
+    });
+  }
+
+  async function persistItemOrder(categoryId: string, ids: string[]) {
+    const res = await fetch("/api/menu-items/reorder", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ categoryId, ids }),
+    });
+    if (!res.ok) {
+      const data = await parseResponse(res);
+      showToast(data.error || "ترتیب آیتم‌ها ذخیره نشد", "error");
+    }
+  }
+
+  function reorderItems(categoryId: string, oldIndex: number, newIndex: number) {
+    setCategories((current) =>
+      current.map((c) => {
+        if (c.id !== categoryId) return c;
+        const reordered = arrayMove(c.items, oldIndex, newIndex);
+        persistItemOrder(categoryId, reordered.map((i) => i.id));
+        return { ...c, items: reordered };
+      })
+    );
+  }
+
   function copyMenuUrl() {
     if (!menuUrl) return;
     navigator.clipboard.writeText(menuUrl);
     showToast("لینک منو کپی شد", "success");
+  }
+
+  async function downloadQrCode() {
+    if (!menuUrl) return;
+    setGeneratingQr(true);
+    try {
+      await downloadMenuQrCode(menuUrl, slug);
+    } catch (err) {
+      console.error("qr code generation error:", err);
+      showToast("ساخت QR کد با خطا مواجه شد", "error");
+    } finally {
+      setGeneratingQr(false);
+    }
   }
 
   return (
@@ -176,12 +255,22 @@ export default function DashboardClient({
             {menuUrl}
           </p>
         </div>
-        <button
-          onClick={copyMenuUrl}
-          className="text-sm border border-ink/20 px-4 py-2 rounded-md hover:bg-ink/5 transition-colors flex-shrink-0"
-        >
-          کپی لینک منو
-        </button>
+        <div className="flex gap-2 flex-shrink-0">
+          <button
+            onClick={downloadQrCode}
+            disabled={generatingQr}
+            className="text-sm border border-ink/20 px-4 py-2 rounded-md hover:bg-ink/5 transition-colors disabled:opacity-60 flex items-center gap-1.5"
+          >
+            <QrIcon />
+            {generatingQr ? "در حال ساخت..." : "دانلود QR کد"}
+          </button>
+          <button
+            onClick={copyMenuUrl}
+            className="text-sm border border-ink/20 px-4 py-2 rounded-md hover:bg-ink/5 transition-colors"
+          >
+            کپی لینک منو
+          </button>
+        </div>
       </header>
 
       <form onSubmit={addCategory} className="mb-10">
@@ -208,25 +297,32 @@ export default function DashboardClient({
         {categoryError && <p className="text-wine text-xs mt-1.5">{categoryError}</p>}
       </form>
 
-      <div className="space-y-6">
-        {categories.map((cat) => (
-          <CategoryBlock
-            key={cat.id}
-            category={cat}
-            onAddItem={addItem}
-            onToggle={toggleAvailable}
-            onDeleteItem={deleteItem}
-            onDeleteCategory={deleteCategory}
-            onUpdateImage={updateCategoryImage}
-            showToast={showToast}
-          />
-        ))}
-        {categories.length === 0 && (
-          <p className="text-muted text-center py-10">
-            هنوز دسته‌بندی‌ای اضافه نکردید. از فرم بالا شروع کنید.
-          </p>
-        )}
-      </div>
+      {categories.length === 0 ? (
+        <p className="text-muted text-center py-10">
+          هنوز دسته‌بندی‌ای اضافه نکردید. از فرم بالا شروع کنید.
+        </p>
+      ) : (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCategoryDragEnd}>
+          <SortableContext items={categories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+            <div className="space-y-6">
+              {categories.map((cat) => (
+                <SortableCategoryBlock
+                  key={cat.id}
+                  category={cat}
+                  onAddItem={addItem}
+                  onToggle={toggleAvailable}
+                  onDeleteItem={deleteItem}
+                  onDeleteCategory={deleteCategory}
+                  onUpdateImage={updateCategoryImage}
+                  onReorderItems={reorderItems}
+                  sensors={sensors}
+                  showToast={showToast}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      )}
       <Toast toast={toast} onDismiss={dismissToast} />
     </main>
   );
@@ -254,6 +350,57 @@ function CameraIcon() {
   );
 }
 
+function QrIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-4 w-4">
+      <rect x="3" y="3" width="7" height="7" strokeWidth={1.5} rx="1" />
+      <rect x="14" y="3" width="7" height="7" strokeWidth={1.5} rx="1" />
+      <rect x="3" y="14" width="7" height="7" strokeWidth={1.5} rx="1" />
+      <path strokeWidth={1.5} strokeLinecap="round" d="M14 14h3m4 0h0M14 18h3m-3 3h7v-4" />
+    </svg>
+  );
+}
+
+function GripIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+      <circle cx="9" cy="6" r="1.4" />
+      <circle cx="15" cy="6" r="1.4" />
+      <circle cx="9" cy="12" r="1.4" />
+      <circle cx="15" cy="12" r="1.4" />
+      <circle cx="9" cy="18" r="1.4" />
+      <circle cx="15" cy="18" r="1.4" />
+    </svg>
+  );
+}
+
+function SortableCategoryBlock(
+  props: React.ComponentProps<typeof CategoryBlock> & { sensors: ReturnType<typeof useSensors> }
+) {
+  const { category, sensors, ...rest } = props;
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: category.id,
+  });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.6 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <CategoryBlock
+        category={category}
+        sensors={sensors}
+        dragHandleAttributes={attributes}
+        dragHandleListeners={listeners}
+        {...rest}
+      />
+    </div>
+  );
+}
+
 function CategoryBlock({
   category,
   onAddItem,
@@ -261,7 +408,11 @@ function CategoryBlock({
   onDeleteItem,
   onDeleteCategory,
   onUpdateImage,
+  onReorderItems,
+  sensors,
   showToast,
+  dragHandleAttributes,
+  dragHandleListeners,
 }: {
   category: Category;
   onAddItem: (
@@ -272,7 +423,11 @@ function CategoryBlock({
   onDeleteItem: (itemId: string, categoryId: string) => void;
   onDeleteCategory: (id: string) => void;
   onUpdateImage: (categoryId: string, imageUrl: string) => void;
+  onReorderItems: (categoryId: string, oldIndex: number, newIndex: number) => void;
+  sensors: ReturnType<typeof useSensors>;
   showToast: (message: string, type?: "success" | "error") => void;
+  dragHandleAttributes?: ReturnType<typeof useSortable>["attributes"];
+  dragHandleListeners?: ReturnType<typeof useSortable>["listeners"];
 }) {
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
@@ -347,10 +502,27 @@ function CategoryBlock({
     }
   }
 
+  function handleItemDragEnd(e: DragEndEvent) {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    const oldIndex = category.items.findIndex((i) => i.id === active.id);
+    const newIndex = category.items.findIndex((i) => i.id === over.id);
+    onReorderItems(category.id, oldIndex, newIndex);
+  }
+
   return (
     <section className="border border-ink/10 rounded-xl p-5 bg-card shadow-soft">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            className="text-muted hover:text-ink cursor-grab active:cursor-grabbing touch-none"
+            aria-label="جابه‌جایی دسته"
+            {...dragHandleAttributes}
+            {...dragHandleListeners}
+          >
+            <GripIcon />
+          </button>
           <label className="relative flex-shrink-0 cursor-pointer group">
             {category.imageUrl ? (
               <img src={category.imageUrl} alt={category.name} className="w-10 h-10 rounded-md object-cover" />
@@ -442,41 +614,84 @@ function CategoryBlock({
         </form>
       )}
 
-      <ul className="divide-y divide-ink/10">
-        {category.items.map((item) => (
-          <li key={item.id} className="py-3 flex items-center gap-3">
-            {item.imageUrl && (
-              <img src={item.imageUrl} alt={item.name} className="w-12 h-12 rounded-md object-cover flex-shrink-0" />
-            )}
-            <div className="flex-1 min-w-0">
-              <p className="text-ink font-medium">{item.name}</p>
-              <p className="text-muted text-sm tabular-nums">
-                {new Intl.NumberFormat("fa-IR").format(item.price)} تومان
-              </p>
-            </div>
-            <button
-              onClick={() => onToggle(item, category.id)}
-              className={`text-xs px-3 py-1 rounded-full border transition-colors ${
-                item.available
-                  ? "border-olive/40 text-olive bg-olive/5"
-                  : "border-muted/40 text-muted"
-              }`}
-            >
-              {item.available ? "موجود" : "ناموجود"}
-            </button>
-            <button
-              onClick={() => onDeleteItem(item.id, category.id)}
-              className="text-muted hover:text-wine transition-colors"
-              aria-label="حذف آیتم"
-            >
-              <TrashIcon />
-            </button>
-          </li>
-        ))}
-        {category.items.length === 0 && !showForm && (
-          <p className="text-muted text-sm py-3">آیتمی در این دسته نیست.</p>
-        )}
-      </ul>
+      {category.items.length === 0 ? (
+        !showForm && <p className="text-muted text-sm py-3">آیتمی در این دسته نیست.</p>
+      ) : (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleItemDragEnd}>
+          <SortableContext items={category.items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+            <ul className="divide-y divide-ink/10">
+              {category.items.map((item) => (
+                <SortableItemRow
+                  key={item.id}
+                  item={item}
+                  onToggle={() => onToggle(item, category.id)}
+                  onDelete={() => onDeleteItem(item.id, category.id)}
+                />
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
+      )}
     </section>
+  );
+}
+
+function SortableItemRow({
+  item,
+  onToggle,
+  onDelete,
+}: {
+  item: MenuItem;
+  onToggle: () => void;
+  onDelete: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.id,
+  });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.6 : 1,
+  };
+
+  return (
+    <li ref={setNodeRef} style={style} className="py-3 flex items-center gap-3 bg-card">
+      <button
+        type="button"
+        className="text-muted hover:text-ink cursor-grab active:cursor-grabbing touch-none flex-shrink-0"
+        aria-label="جابه‌جایی آیتم"
+        {...attributes}
+        {...listeners}
+      >
+        <GripIcon />
+      </button>
+      {item.imageUrl && (
+        <img src={item.imageUrl} alt={item.name} className="w-12 h-12 rounded-md object-cover flex-shrink-0" />
+      )}
+      <div className="flex-1 min-w-0">
+        <p className="text-ink font-medium">{item.name}</p>
+        <p className="text-muted text-sm tabular-nums">
+          {new Intl.NumberFormat("fa-IR").format(item.price)} تومان
+        </p>
+      </div>
+      <button
+        onClick={onToggle}
+        className={`text-xs px-3 py-1 rounded-full border transition-colors ${
+          item.available
+            ? "border-olive/40 text-olive bg-olive/5"
+            : "border-muted/40 text-muted"
+        }`}
+      >
+        {item.available ? "موجود" : "ناموجود"}
+      </button>
+      <button
+        onClick={onDelete}
+        className="text-muted hover:text-wine transition-colors"
+        aria-label="حذف آیتم"
+      >
+        <TrashIcon />
+      </button>
+    </li>
   );
 }

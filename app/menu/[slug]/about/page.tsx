@@ -128,7 +128,7 @@ export default async function AboutPage({ params }: { params: { slug: string } }
             href={restaurant.locationUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="block text-center bg-ink text-paper py-3 rounded-md font-medium hover:bg-ink/90 transition-colors mb-8"
+            className="block text-center bg-gold text-paper py-3 rounded-md font-medium hover:bg-gold/90 transition-colors mb-8"
           >
             مسیریابی روی نقشه
           </a>

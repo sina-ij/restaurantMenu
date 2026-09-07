@@ -42,6 +42,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "دسته‌بندی نامعتبر است" }, { status: 400 });
     }
 
+    const count = await prisma.menuItem.count({ where: { categoryId } });
     const item = await prisma.menuItem.create({
       data: {
         name: name.trim(),
@@ -49,6 +50,7 @@ export async function POST(req: NextRequest) {
         price: priceNumber,
         imageUrl: imageUrl || null,
         categoryId,
+        order: count,
       },
     });
 

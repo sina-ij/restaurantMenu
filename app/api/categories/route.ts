@@ -21,11 +21,13 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const count = await prisma.category.count({ where: { restaurantId: restaurant.id } });
     const category = await prisma.category.create({
       data: {
         name: body.name.trim(),
         imageUrl: body.imageUrl || null,
         restaurantId: restaurant.id,
+        order: count,
       },
     });
     return NextResponse.json(category);
