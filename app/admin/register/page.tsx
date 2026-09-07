@@ -9,7 +9,7 @@ import { PasswordInput } from "@/components/PasswordInput";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-type Field = "restaurantName" | "email" | "password" | "confirmPassword";
+type Field = "email" | "password" | "confirmPassword";
 
 async function parseResponse(res: Response) {
   try {
@@ -21,7 +21,6 @@ async function parseResponse(res: Response) {
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [restaurantName, setRestaurantName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -31,9 +30,6 @@ export default function RegisterPage() {
 
   function validate() {
     const errors: Partial<Record<Field, string>> = {};
-    if (!restaurantName.trim()) {
-      errors.restaurantName = "نام رستوران یا کافه را وارد کنید";
-    }
     if (!email.trim()) {
       errors.email = "ایمیل را وارد کنید";
     } else if (!EMAIL_RE.test(email.trim())) {
@@ -62,7 +58,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ restaurantName, email, password }),
+        body: JSON.stringify({ email, password }),
       });
       const data = await parseResponse(res);
 
@@ -90,33 +86,13 @@ export default function RegisterPage() {
 
         <div className="bg-card border border-ink/10 rounded-xl shadow-lift p-7 md:p-8">
           <h1 className="font-display font-semibold text-2xl text-ink mb-2 text-center">
-            ساخت حساب رستوران
+            ساخت حساب کاربری
           </h1>
           <p className="text-muted text-sm text-center mb-8">
-            چند ثانیه‌ای منوی دیجیتال خودتون رو راه بندازید
+            بعد از ورود می‌تونی رستوران یا کافه‌ت رو بسازی
           </p>
 
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
-            <div>
-              <label className="block text-sm text-ink mb-1.5 font-medium">
-                نام رستوران/کافه
-              </label>
-              <input
-                type="text"
-                value={restaurantName}
-                onChange={(e) => setRestaurantName(e.target.value)}
-                className={`w-full border rounded-md px-4 py-2.5 bg-white focus:outline-none focus:ring-2 transition-shadow ${
-                  fieldErrors.restaurantName
-                    ? "border-wine ring-wine/20"
-                    : "border-ink/20 focus:ring-gold/40"
-                }`}
-                placeholder="کافه گلستان"
-              />
-              {fieldErrors.restaurantName && (
-                <p className="text-wine text-xs mt-1.5">{fieldErrors.restaurantName}</p>
-              )}
-            </div>
-
             <div>
               <label className="block text-sm text-ink mb-1.5 font-medium">ایمیل</label>
               <input

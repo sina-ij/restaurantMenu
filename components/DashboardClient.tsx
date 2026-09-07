@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Toast, useToast } from "@/components/Toast";
-import RestaurantSettings, { RestaurantInfo } from "@/components/RestaurantSettings";
 
 type MenuItem = {
   id: string;
@@ -30,14 +28,12 @@ async function parseResponse(res: Response) {
 }
 
 export default function DashboardClient({
-  restaurant: initialRestaurant,
+  slug,
   initialCategories,
 }: {
-  restaurant: RestaurantInfo;
+  slug: string;
   initialCategories: Category[];
 }) {
-  const router = useRouter();
-  const [restaurant, setRestaurant] = useState<RestaurantInfo>(initialRestaurant);
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [categoryError, setCategoryError] = useState("");
@@ -46,7 +42,7 @@ export default function DashboardClient({
 
   useState(() => {
     if (typeof window !== "undefined") {
-      setMenuUrl(`${window.location.origin}/menu/${restaurant.slug}`);
+      setMenuUrl(`${window.location.origin}/menu/${slug}`);
     }
   });
 
@@ -165,12 +161,6 @@ export default function DashboardClient({
     }
   }
 
-  async function handleLogout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/admin/login");
-    router.refresh();
-  }
-
   function copyMenuUrl() {
     if (!menuUrl) return;
     navigator.clipboard.writeText(menuUrl);
@@ -178,36 +168,21 @@ export default function DashboardClient({
   }
 
   return (
-    <main className="min-h-screen px-4 py-8 md:px-10 max-w-3xl mx-auto">
+    <main className="px-4 py-8 md:px-10 max-w-3xl mx-auto">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-ink/10">
-        <div className="flex items-center gap-3">
-          {restaurant.logoUrl && (
-            <img src={restaurant.logoUrl} alt={restaurant.name} className="w-12 h-12 rounded-full object-cover" />
-          )}
-          <div>
-            <h1 className="font-display font-semibold text-2xl text-ink">{restaurant.name}</h1>
-            <p className="text-muted text-sm mt-1 break-all" dir="ltr">
-              {menuUrl}
-            </p>
-          </div>
+        <div>
+          <h1 className="font-display font-semibold text-2xl text-ink">منو و دسته‌بندی‌ها</h1>
+          <p className="text-muted text-sm mt-1 break-all" dir="ltr">
+            {menuUrl}
+          </p>
         </div>
-        <div className="flex gap-2 flex-shrink-0">
-          <button
-            onClick={copyMenuUrl}
-            className="text-sm border border-ink/20 px-4 py-2 rounded-md hover:bg-ink/5 transition-colors"
-          >
-            کپی لینک منو
-          </button>
-          <button
-            onClick={handleLogout}
-            className="text-sm text-muted hover:text-ink px-4 py-2"
-          >
-            خروج
-          </button>
-        </div>
+        <button
+          onClick={copyMenuUrl}
+          className="text-sm border border-ink/20 px-4 py-2 rounded-md hover:bg-ink/5 transition-colors flex-shrink-0"
+        >
+          کپی لینک منو
+        </button>
       </header>
-
-      <RestaurantSettings restaurant={restaurant} onSave={setRestaurant} showToast={showToast} />
 
       <form onSubmit={addCategory} className="mb-10">
         <div className="flex gap-2">
