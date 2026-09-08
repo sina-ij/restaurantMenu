@@ -37,7 +37,7 @@ export default async function AboutPage({ params }: { params: { slug: string } }
             <img
               src={restaurant.logoUrl}
               alt={restaurant.name}
-              className="mx-auto mb-4 h-20 w-20 rounded-full border-2 border-white object-cover shadow-soft"
+              className="mx-auto mb-4 h-20 w-20 rounded-full bg-white object-contain p-1.5 shadow-soft ring-1 ring-ink/10"
             />
           ) : (
             <span className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gold/10 text-gold shadow-soft">
