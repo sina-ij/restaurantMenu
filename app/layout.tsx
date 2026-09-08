@@ -16,7 +16,7 @@ const notoNaskh = Noto_Naskh_Arabic({
 
 export const metadata: Metadata = {
   title: "منوی دیجیتال رستوران و کافه",
-  description: "بساز، اسکن کن، سفارش بده — منوی دیجیتال برای رستوران و کافه شما",
+  description: "بساز، اسکن کن، سفارش بده؛ منوی دیجیتال برای رستوران و کافه شما",
 };
 
 export default function RootLayout({

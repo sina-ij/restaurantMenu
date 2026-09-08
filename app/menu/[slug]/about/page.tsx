@@ -1,47 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { MapPin, Phone, Clock, ForkKnife, NavigationArrow, ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BackgroundPattern } from "@/components/BackgroundPattern";
+import { Reveal } from "@/components/Reveal";
 import { hexToRgbTriplet } from "@/lib/color";
 
 export const revalidate = 0;
-
-function PhoneIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-5 w-5 flex-shrink-0">
-      <path
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M4 5c0-.6.4-1 1-1h2.3c.5 0 .9.3 1 .8l.8 3a1 1 0 0 1-.3 1L7.5 10a12 12 0 0 0 6 6l1.2-1.3a1 1 0 0 1 1-.3l3 .8c.5.1.8.5.8 1V19c0 .6-.4 1-1 1h-1C9.5 20 4 14.5 4 7.5V5Z"
-      />
-    </svg>
-  );
-}
-
-function MapPinIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-5 w-5 flex-shrink-0">
-      <path
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21Z"
-      />
-      <circle cx="12" cy="9.5" r="2.3" strokeWidth={1.5} />
-    </svg>
-  );
-}
-
-function ClockIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-5 w-5 flex-shrink-0">
-      <circle cx="12" cy="12" r="8.5" strokeWidth={1.5} />
-      <path strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" d="M12 7.5V12l3 2" />
-    </svg>
-  );
-}
 
 export default async function AboutPage({ params }: { params: { slug: string } }) {
   const restaurant = await prisma.restaurant.findUnique({
@@ -61,40 +27,44 @@ export default async function AboutPage({ params }: { params: { slug: string } }
       <div className="fixed top-4 left-4 z-20">
         <ThemeToggle />
       </div>
-      <header className="relative border-b border-ink/10 px-6 pt-12 pb-8 text-center">
-        {restaurant.logoUrl ? (
-          <img
-            src={restaurant.logoUrl}
-            alt={restaurant.name}
-            className="w-16 h-16 rounded-full object-cover mx-auto mb-4 border-2 border-white shadow-soft"
-          />
-        ) : (
-          <div className="flex items-center justify-center gap-2 text-gold mb-4" aria-hidden="true">
-            <span className="h-px w-8 bg-gold/40" />
-            <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
-            <span className="h-px w-8 bg-gold/40" />
-          </div>
-        )}
-        {restaurant.businessType && (
-          <span className="inline-block text-xs px-3 py-1 rounded-full border border-gold/40 text-gold mb-2">
-            {restaurant.businessType}
-          </span>
-        )}
-        <h1 className="font-display font-semibold text-3xl text-ink">{restaurant.name}</h1>
-        <p className="text-muted mt-2 text-sm">درباره ما</p>
+      <header className="relative overflow-hidden border-b border-ink/10 px-6 pt-14 pb-10 text-center">
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-gold/15 to-transparent"
+          aria-hidden="true"
+        />
+        <div className="relative">
+          {restaurant.logoUrl ? (
+            <img
+              src={restaurant.logoUrl}
+              alt={restaurant.name}
+              className="mx-auto mb-4 h-20 w-20 rounded-full border-2 border-white object-cover shadow-soft"
+            />
+          ) : (
+            <span className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gold/10 text-gold shadow-soft">
+              <ForkKnife className="h-7 w-7" weight="duotone" />
+            </span>
+          )}
+          {restaurant.businessType && (
+            <span className="mb-2 inline-block rounded-full border border-gold/40 px-3 py-1 text-xs text-gold">
+              {restaurant.businessType}
+            </span>
+          )}
+          <h1 className="font-display text-3xl font-semibold text-ink">{restaurant.name}</h1>
+          <p className="mt-2 text-sm text-muted">درباره ما</p>
+        </div>
       </header>
 
-      <div className="relative max-w-md mx-auto px-4 py-10">
+      <Reveal className="relative mx-auto max-w-md px-4 py-10">
         {restaurant.description && (
-          <p className="text-ink/90 leading-relaxed mb-8 text-center">{restaurant.description}</p>
+          <p className="mb-8 text-center leading-relaxed text-ink/90">{restaurant.description}</p>
         )}
 
         {hasInfo && (
-          <div className="bg-card border border-ink/10 rounded-xl shadow-soft divide-y divide-ink/10 mb-8">
+          <div className="mb-8 grid gap-3">
             {restaurant.address && (
-              <div className="flex items-start gap-3 p-4 text-ink/90">
-                <span className="text-gold mt-0.5">
-                  <MapPinIcon />
+              <div className="flex items-start gap-3 rounded-2xl border border-ink/10 bg-card p-4 text-ink/90 shadow-soft">
+                <span className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gold/10 text-gold">
+                  <MapPin className="h-5 w-5" weight="duotone" />
                 </span>
                 <span className="leading-relaxed">{restaurant.address}</span>
               </div>
@@ -102,10 +72,10 @@ export default async function AboutPage({ params }: { params: { slug: string } }
             {restaurant.phone && (
               <a
                 href={`tel:${restaurant.phone}`}
-                className="flex items-start gap-3 p-4 text-ink/90 hover:bg-ink/5 transition-colors"
+                className="flex items-start gap-3 rounded-2xl border border-ink/10 bg-card p-4 text-ink/90 shadow-soft transition-colors hover:bg-ink/5"
               >
-                <span className="text-gold mt-0.5">
-                  <PhoneIcon />
+                <span className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gold/10 text-gold">
+                  <Phone className="h-5 w-5" weight="duotone" />
                 </span>
                 <span dir="ltr" className="leading-relaxed">
                   {restaurant.phone}
@@ -113,9 +83,9 @@ export default async function AboutPage({ params }: { params: { slug: string } }
               </a>
             )}
             {restaurant.workingHours && (
-              <div className="flex items-start gap-3 p-4 text-ink/90">
-                <span className="text-gold mt-0.5">
-                  <ClockIcon />
+              <div className="flex items-start gap-3 rounded-2xl border border-ink/10 bg-card p-4 text-ink/90 shadow-soft">
+                <span className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gold/10 text-gold">
+                  <Clock className="h-5 w-5" weight="duotone" />
                 </span>
                 <span className="leading-relaxed">{restaurant.workingHours}</span>
               </div>
@@ -128,18 +98,23 @@ export default async function AboutPage({ params }: { params: { slug: string } }
             href={restaurant.locationUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="block text-center bg-gold text-paper py-3 rounded-md font-medium hover:bg-gold/90 transition-colors mb-8"
+            className="mb-8 flex items-center justify-center gap-2 rounded-xl bg-gold py-3 font-medium text-paper transition-colors hover:bg-gold/90"
           >
+            <NavigationArrow className="h-5 w-5" weight="fill" />
             مسیریابی روی نقشه
           </a>
         )}
 
         <div className="text-center">
-          <Link href={`/menu/${restaurant.slug}`} className="text-sm text-gold hover:underline">
-            ‹ بازگشت به منو
+          <Link
+            href={`/menu/${restaurant.slug}`}
+            className="inline-flex items-center gap-1.5 text-sm text-gold hover:underline"
+          >
+            <ArrowRight className="h-4 w-4" weight="bold" />
+            بازگشت به منو
           </Link>
         </div>
-      </div>
+      </Reveal>
     </main>
   );
 }

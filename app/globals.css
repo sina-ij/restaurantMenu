@@ -22,6 +22,10 @@
   --color-muted: 158 148 135;
 }
 
+/* Shape Consistency Lock: یک مقیاس گوشه در کل پروژه.
+   کارت/پنل/مودال = rounded-2xl (۱۶px)، اینپوت/دکمه = rounded-xl (۱۲px)،
+   pill/آواتار/دکمه‌ی آیکونی = rounded-full. */
+
 * {
   border-color: theme("colors.ink" / 12%);
 }
@@ -30,6 +34,7 @@ html {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   color-scheme: light;
+  scroll-behavior: smooth;
 }
 
 html.dark {
@@ -96,4 +101,19 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .animate-toast-in {
   animation: toast-in 0.2s ease-out;
+}
+
+/* Reduced motion: هر انیمیشن/ترنزیشن به حداقل می‌رسد (بخش ۶.B اسکیل). */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

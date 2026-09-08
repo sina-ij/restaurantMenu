@@ -20,7 +20,7 @@ export default function SuperAdminHeader() {
           <ThemeToggle />
           <button
             onClick={handleLogout}
-            className="text-sm text-wine hover:bg-wine/5 px-3 py-1.5 rounded-md transition-colors"
+            className="text-sm text-wine hover:bg-wine/5 px-3 py-1.5 rounded-xl transition-colors"
           >
             خروج
           </button>

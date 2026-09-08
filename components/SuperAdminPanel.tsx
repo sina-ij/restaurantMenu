@@ -114,7 +114,7 @@ export default function SuperAdminPanel() {
       <form
         onSubmit={handleCreate}
         noValidate
-        className="bg-card border border-ink/10 rounded-xl shadow-soft p-6 space-y-4 mb-10"
+        className="bg-card border border-ink/10 rounded-2xl shadow-soft p-6 space-y-4 mb-10"
       >
         <h2 className="font-display font-semibold text-lg text-ink">افزودن رستوران‌دار جدید</h2>
 
@@ -125,7 +125,7 @@ export default function SuperAdminPanel() {
             value={restaurantName}
             onChange={(e) => handleNameChange(e.target.value)}
             placeholder="کافه گلستان"
-            className={`w-full border rounded-md px-4 py-2 bg-white focus:outline-none focus:ring-2 transition-shadow ${
+            className={`w-full border rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 transition-shadow ${
               fieldErrors.restaurantName ? "border-wine ring-wine/20" : "border-ink/20 focus:ring-gold/40"
             }`}
           />
@@ -139,7 +139,7 @@ export default function SuperAdminPanel() {
           <select
             value={businessType}
             onChange={(e) => setBusinessType(e.target.value)}
-            className="w-full border border-ink/20 rounded-md px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
+            className="w-full border border-ink/20 rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
           >
             <option value="">انتخاب کنید</option>
             {BUSINESS_TYPES.map((t) => (
@@ -153,7 +153,7 @@ export default function SuperAdminPanel() {
         <div>
           <label className="block text-sm text-ink mb-1.5 font-medium">آدرس انگلیسی منو</label>
           <div
-            className={`flex items-center border rounded-md bg-white overflow-hidden focus-within:ring-2 transition-shadow ${
+            className={`flex items-center border rounded-xl bg-white overflow-hidden focus-within:ring-2 transition-shadow ${
               fieldErrors.slug ? "border-wine ring-wine/20" : "border-ink/20 focus-within:ring-gold/40"
             }`}
           >
@@ -183,7 +183,7 @@ export default function SuperAdminPanel() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="owner@example.com"
-            className={`w-full border rounded-md px-4 py-2 bg-white text-left focus:outline-none focus:ring-2 transition-shadow ${
+            className={`w-full border rounded-xl px-4 py-2 bg-white text-left focus:outline-none focus:ring-2 transition-shadow ${
               fieldErrors.email ? "border-wine ring-wine/20" : "border-ink/20 focus:ring-gold/40"
             }`}
           />
@@ -198,7 +198,7 @@ export default function SuperAdminPanel() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="حداقل ۶ کاراکتر"
-            className={`w-full border rounded-md px-4 py-2 bg-white text-left focus:outline-none focus:ring-2 transition-shadow ${
+            className={`w-full border rounded-xl px-4 py-2 bg-white text-left focus:outline-none focus:ring-2 transition-shadow ${
               fieldErrors.password ? "border-wine ring-wine/20" : "border-ink/20 focus:ring-gold/40"
             }`}
           />
@@ -208,7 +208,7 @@ export default function SuperAdminPanel() {
         <button
           type="submit"
           disabled={creating}
-          className="bg-ink text-paper px-5 py-2 rounded-md hover:bg-ink/90 transition-colors disabled:opacity-60"
+          className="bg-ink text-paper px-5 py-2 rounded-xl hover:bg-ink/90 transition-colors disabled:opacity-60"
         >
           {creating ? "در حال ساخت..." : "ساخت رستوران‌دار"}
         </button>
@@ -251,7 +251,7 @@ function OwnerRow({
   }
 
   return (
-    <div className="bg-card border border-ink/10 rounded-lg p-4 shadow-soft">
+    <div className="bg-card border border-ink/10 rounded-2xl p-4 shadow-soft">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="text-ink font-medium truncate">{owner.restaurantName ?? "بدون رستوران"}</p>
@@ -275,12 +275,12 @@ function OwnerRow({
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             placeholder="رمز عبور جدید (حداقل ۶ کاراکتر)"
-            className="flex-1 border border-ink/20 rounded-md px-3 py-1.5 bg-white text-left text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
+            className="flex-1 border border-ink/20 rounded-xl px-3 py-1.5 bg-white text-left text-sm focus:outline-none focus:ring-2 focus:ring-gold/40"
           />
           <button
             type="submit"
             disabled={saving || newPassword.length < 6}
-            className="bg-ink text-paper px-4 py-1.5 rounded-md text-sm hover:bg-ink/90 transition-colors disabled:opacity-60"
+            className="bg-ink text-paper px-4 py-1.5 rounded-xl text-sm hover:bg-ink/90 transition-colors disabled:opacity-60"
           >
             {saving ? "..." : "ذخیره"}
           </button>

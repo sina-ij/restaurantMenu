@@ -72,7 +72,7 @@ export default function LoginPage() {
           <span className="font-display font-semibold text-lg text-ink">منوی دیجیتال</span>
         </Link>
 
-        <div className="bg-card border border-ink/10 rounded-xl shadow-lift p-7 md:p-8">
+        <div className="bg-card border border-ink/10 rounded-2xl shadow-lift p-7 md:p-8">
           <h1 className="font-display font-semibold text-2xl text-ink mb-8 text-center">
             ورود ادمین
           </h1>
@@ -85,7 +85,7 @@ export default function LoginPage() {
                 dir="ltr"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className={`w-full border rounded-md px-4 py-2.5 bg-white text-left focus:outline-none focus:ring-2 transition-shadow ${
+                className={`w-full border rounded-xl px-4 py-2.5 bg-white text-left focus:outline-none focus:ring-2 transition-shadow ${
                   fieldErrors.email ? "border-wine ring-wine/20" : "border-ink/20 focus:ring-gold/40"
                 }`}
               />
@@ -107,7 +107,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-ink text-paper py-2.5 rounded-md font-medium hover:bg-ink/90 transition-colors disabled:opacity-60"
+              className="w-full bg-ink text-paper py-2.5 rounded-xl font-medium hover:bg-ink/90 transition-colors active:scale-[0.99] disabled:opacity-60"
             >
               {loading ? "در حال ورود..." : "ورود"}
             </button>
@@ -117,8 +117,8 @@ export default function LoginPage() {
         <div className="mt-10 pt-6 border-t border-ink/10 text-center">
           <p className="text-muted text-xs leading-relaxed max-w-xs mx-auto">
             این سامانه ابزاری ساده برای ساخت منوی دیجیتال رستوران و کافه‌ست؛ منوی خودتون
-            رو بسازید، از آن QR کد بگیرید و هر وقت خواستید به‌روزش کنید — تغییرات همون
-            لحظه برای مشتری نمایش داده می‌شه.
+            رو بسازید، از آن QR کد بگیرید و هر وقت خواستید به‌روزش کنید. تغییرات همان
+            لحظه برای مشتری نمایش داده می‌شود.
           </p>
           <a
             href="https://t.me/sina_ij"

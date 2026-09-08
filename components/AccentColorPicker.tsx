@@ -1,5 +1,6 @@
 "use client";
 
+import { Check } from "@phosphor-icons/react";
 import { ACCENT_COLORS } from "@/lib/color";
 
 export function AccentColorPicker({
@@ -26,14 +27,7 @@ export function AccentColorPicker({
             title={c.label}
           >
             {selected && (
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                className="absolute inset-0 m-auto h-4 w-4"
-              >
-                <path strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" d="m5 13 4 4L19 7" />
-              </svg>
+              <Check className="absolute inset-0 m-auto h-4 w-4 text-white" weight="bold" />
             )}
           </button>
         );

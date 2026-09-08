@@ -41,9 +41,14 @@ export async function POST(req: NextRequest) {
     });
 
     const res = NextResponse.json({ role: user.role, slug: user.restaurant?.slug });
+    // کوکی فقط وقتی secure می‌شود که درخواست واقعاً HTTPS باشد (بر اساس
+    // X-Forwarded-Proto که nginx می‌فرستد). این‌طوری روی HTTP هم کار می‌کند و
+    // با فعال‌شدن HTTPS خودکار secure می‌شود. (NODE_ENV مبنای درستی نیست چون
+    // یک دیپلویِ production ممکن است هنوز روی HTTP باشد.)
+    const isHttps = req.headers.get("x-forwarded-proto") === "https";
     res.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isHttps,
       sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 7,

@@ -125,7 +125,7 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="bg-card border border-ink/10 rounded-xl shadow-soft p-6 space-y-4"
+        className="bg-card border border-ink/10 rounded-2xl shadow-soft p-6 space-y-4"
       >
         <div className="flex items-center gap-4">
           <div className="flex-shrink-0">
@@ -153,7 +153,7 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
               setName(e.target.value);
               if (nameError) setNameError("");
             }}
-            className={`w-full border rounded-md px-4 py-2 bg-white focus:outline-none focus:ring-2 transition-shadow ${
+            className={`w-full border rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 transition-shadow ${
               nameError ? "border-wine ring-wine/20" : "border-ink/20 focus:ring-gold/40"
             }`}
           />
@@ -165,7 +165,7 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
           <select
             value={businessType}
             onChange={(e) => setBusinessType(e.target.value)}
-            className="w-full border border-ink/20 rounded-md px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
+            className="w-full border border-ink/20 rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
           >
             <option value="">انتخاب کنید</option>
             {BUSINESS_TYPES.map((t) => (
@@ -184,7 +184,7 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
         <div>
           <label className="block text-sm text-ink mb-1.5 font-medium">آدرس انگلیسی منو</label>
           <div
-            className={`flex items-center border rounded-md bg-white overflow-hidden focus-within:ring-2 transition-shadow ${
+            className={`flex items-center border rounded-xl bg-white overflow-hidden focus-within:ring-2 transition-shadow ${
               slugError ? "border-wine ring-wine/20" : "border-ink/20 focus-within:ring-gold/40"
             }`}
           >
@@ -212,7 +212,7 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
             placeholder="یک معرفی کوتاه از کافه/رستوران"
-            className="w-full border border-ink/20 rounded-md px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
+            className="w-full border border-ink/20 rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
           />
         </div>
 
@@ -224,7 +224,7 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="021-xxxxxxx"
-            className="w-full border border-ink/20 rounded-md px-4 py-2 bg-white text-left focus:outline-none focus:ring-2 focus:ring-gold/40"
+            className="w-full border border-ink/20 rounded-xl px-4 py-2 bg-white text-left focus:outline-none focus:ring-2 focus:ring-gold/40"
           />
         </div>
 
@@ -235,7 +235,7 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             placeholder="آدرس کامل کافه/رستوران"
-            className="w-full border border-ink/20 rounded-md px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
+            className="w-full border border-ink/20 rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
           />
         </div>
 
@@ -246,7 +246,7 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
             value={workingHours}
             onChange={(e) => setWorkingHours(e.target.value)}
             placeholder="مثلاً: هر روز ۹ صبح تا ۱۱ شب"
-            className="w-full border border-ink/20 rounded-md px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
+            className="w-full border border-ink/20 rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
           />
         </div>
 
@@ -258,14 +258,14 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
             value={locationUrl}
             onChange={(e) => setLocationUrl(e.target.value)}
             placeholder="https://maps.google.com/..."
-            className="w-full border border-ink/20 rounded-md px-4 py-2 bg-white text-left focus:outline-none focus:ring-2 focus:ring-gold/40"
+            className="w-full border border-ink/20 rounded-xl px-4 py-2 bg-white text-left focus:outline-none focus:ring-2 focus:ring-gold/40"
           />
         </div>
 
         <button
           type="submit"
           disabled={saving}
-          className="bg-ink text-paper px-5 py-2 rounded-md hover:bg-ink/90 transition-colors disabled:opacity-60"
+          className="bg-ink text-paper px-5 py-2 rounded-xl hover:bg-ink/90 transition-colors disabled:opacity-60"
         >
           {saving ? "در حال ذخیره..." : "ذخیره اطلاعات"}
         </button>

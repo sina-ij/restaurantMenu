@@ -1,91 +1,110 @@
 import Link from "next/link";
+import { QrCode, Lightning, Sparkle, ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { BackgroundPattern } from "@/components/BackgroundPattern";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { Reveal } from "@/components/Reveal";
 
-function Divider() {
+const features = [
+  { title: "QR اختصاصی", desc: "یک لینک و کد QR منحصربه‌فرد برای منوی شما", Icon: QrCode },
+  { title: "بروزرسانی آنی", desc: "هر تغییری بدهید، همان لحظه به مشتری نمایش داده می‌شود", Icon: Lightning },
+  { title: "طراحی زیبا", desc: "صفحه‌ای در شأن رستوران و کافه‌ی شما", Icon: Sparkle },
+];
+
+// پیش‌نمایشِ واقعیِ محصول (نه اسکرین‌شات جعلی): یک منوی کوچک با همان زبان طراحی.
+function MenuPreview() {
+  const items = [
+    { name: "قهوه‌ی دمی", price: "۸۵٬۰۰۰" },
+    { name: "لاته", price: "۱۲۰٬۰۰۰" },
+    { name: "چیزکیک", price: "۱۶۵٬۰۰۰" },
+  ];
   return (
-    <div className="flex items-center justify-center gap-2 text-gold" aria-hidden="true">
-      <span className="h-px w-8 bg-gold/40" />
-      <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
-      <span className="h-px w-8 bg-gold/40" />
+    <div className="mx-auto w-[248px] rounded-[2.4rem] border border-ink/15 bg-card p-2.5 shadow-lift">
+      <div className="overflow-hidden rounded-[1.9rem] bg-paper">
+        <div className="bg-gradient-to-b from-gold/25 to-gold/5 px-5 pb-5 pt-6 text-center">
+          <span className="mb-2 inline-block rounded-full border border-gold/40 px-2.5 py-0.5 text-[10px] text-gold">
+            کافه
+          </span>
+          <p className="font-display text-lg font-semibold text-ink">کافه‌ی نمونه</p>
+        </div>
+        <div className="space-y-2.5 px-4 pb-5 pt-4">
+          <p className="font-display text-sm font-semibold text-ink">نوشیدنی‌های گرم</p>
+          {items.map((it) => (
+            <div
+              key={it.name}
+              className="flex items-baseline justify-between gap-2 rounded-xl border border-ink/5 bg-card px-3 py-2.5 shadow-soft"
+            >
+              <span className="text-xs font-semibold text-ink">{it.name}</span>
+              <span className="text-xs font-medium tabular-nums text-gold">{it.price}</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
 
-const features = [
-  {
-    title: "QR اختصاصی",
-    desc: "یک لینک و QR کد منحصربه‌فرد برای منوی شما",
-    icon: (
-      <path
-        strokeWidth={1.5}
-        d="M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm10 3h3m-3 3h6v-6h-3"
-      />
-    ),
-  },
-  {
-    title: "بروزرسانی آنی",
-    desc: "هر تغییری بدید، همون لحظه برای مشتری نمایش داده میشه",
-    icon: <path strokeWidth={1.5} d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3M18 4v4h-4M6 20v-4h4" />,
-  },
-  {
-    title: "طراحی زیبا",
-    desc: "صفحه‌ی منویی که در شأن رستوران و کافه‌تونه",
-    icon: <path strokeWidth={1.5} d="M12 3 4 7v6c0 4.5 3.4 7.5 8 8 4.6-.5 8-3.5 8-8V7l-8-4Z" />,
-  },
-];
-
 export default function Home() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-paper flex flex-col justify-center">
-      <BackgroundPattern />
+    <main className="relative min-h-[100dvh] overflow-hidden bg-paper">
+      <BackgroundPattern opacity={0.5} />
       <div
-        className="pointer-events-none absolute -top-24 -right-16 h-72 w-72 rounded-full bg-gold/20 blur-3xl"
+        className="pointer-events-none absolute -top-28 right-[-6rem] h-80 w-80 rounded-full bg-gold/20 blur-3xl"
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-wine/10 blur-3xl"
+        className="pointer-events-none absolute -bottom-32 left-[-6rem] h-80 w-80 rounded-full bg-wine/10 blur-3xl"
         aria-hidden="true"
       />
 
-      <section className="relative flex flex-col items-center px-6 py-10 max-w-2xl mx-auto text-center">
-        <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-4 py-1.5 text-xs text-ink/80 font-body mb-5">
-          منوی دیجیتال با QR کد
-        </span>
+      <div className="fixed top-4 left-4 z-20">
+        <ThemeToggle />
+      </div>
 
-        <h1 className="font-display font-semibold text-3xl md:text-5xl leading-[1.5] md:leading-[1.45] text-ink mb-4">
-          مشتری‌هاتون یک اسکن با گوشیشون
-          <br />
-          تا دیدن کل منوی شما فاصله دارن
-        </h1>
+      <section className="relative mx-auto flex min-h-[100dvh] max-w-6xl items-start px-6 py-16 lg:items-center">
+        <div className="grid w-full items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
+          {/* ستون محتوا */}
+          <Reveal className="text-center lg:text-right">
+            <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-4 py-1.5 text-xs text-ink/80">
+              منوی دیجیتال با کد QR
+            </span>
 
-        <p className="text-muted text-sm md:text-lg leading-7 md:leading-8 mb-6 max-w-xl">
-          یک صفحه‌ی زیبا برای منوی رستوران یا کافه‌تون بسازید و با یک لینک یا
-          QR کد در اختیار مشتری بذارید — همون لحظه که تغییرش می‌دید، برای مشتری هم اعمال میشه.
-        </p>
+            <h1 className="font-display text-[1.75rem] font-semibold leading-[1.4] text-ink sm:text-4xl md:text-5xl md:leading-[1.3]">
+              منوی رستورانتان، یک اسکن با مشتری فاصله دارد
+            </h1>
 
-        <div className="flex justify-center mb-8">
-          <Link
-            href="/admin/login"
-            className="bg-ink text-paper px-10 py-3 rounded-md font-body font-medium shadow-lift hover:bg-ink/90 transition-colors"
-          >
-            ورود
-          </Link>
-        </div>
+            <p className="mx-auto mt-5 max-w-md text-base leading-8 text-muted lg:mx-0">
+              یک صفحه‌ی زیبا برای منوی کافه یا رستورانتان بسازید و با یک کد QR در اختیار مشتری بگذارید.
+            </p>
 
-        <Divider />
-
-        <div className="grid grid-cols-3 gap-3 sm:gap-8 mt-6 w-full">
-          {features.map((f) => (
-            <div key={f.title} className="flex flex-col items-center text-center gap-2">
-              <span className="flex h-10 w-10 md:h-11 md:w-11 items-center justify-center rounded-full bg-white shadow-soft text-gold">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-4 w-4 md:h-5 md:w-5">
-                  {f.icon}
-                </svg>
-              </span>
-              <h3 className="font-body font-semibold text-ink text-xs md:text-sm">{f.title}</h3>
-              <p className="hidden sm:block text-muted text-xs leading-relaxed">{f.desc}</p>
+            <div className="mt-8 flex justify-center lg:justify-start">
+              <Link
+                href="/admin/login"
+                className="group inline-flex items-center gap-2 rounded-xl bg-ink px-9 py-3.5 font-medium text-paper shadow-lift transition-all hover:bg-ink/90 active:scale-[0.98]"
+              >
+                ورود
+                <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" weight="bold" />
+              </Link>
             </div>
-          ))}
+
+            <ul className="mt-12 grid gap-5 border-t border-ink/10 pt-8 sm:grid-cols-2 lg:grid-cols-1">
+              {features.map((f) => (
+                <li key={f.title} className="flex items-start gap-3 text-right">
+                  <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gold/10 text-gold">
+                    <f.Icon className="h-5 w-5" weight="duotone" />
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-ink">{f.title}</span>
+                    <span className="mt-0.5 block text-xs leading-relaxed text-muted">{f.desc}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+
+          {/* ستون ویژوال: پیش‌نمایش منو */}
+          <Reveal delay={0.12}>
+            <MenuPreview />
+          </Reveal>
         </div>
       </section>
     </main>

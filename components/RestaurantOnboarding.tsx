@@ -92,7 +92,7 @@ export default function RestaurantOnboarding() {
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="bg-card border border-ink/10 rounded-xl shadow-soft p-6 space-y-4"
+          className="bg-card border border-ink/10 rounded-2xl shadow-soft p-6 space-y-4"
         >
           <div>
             <label className="block text-sm text-ink mb-1.5 font-medium">نام رستوران/کافه</label>
@@ -101,7 +101,7 @@ export default function RestaurantOnboarding() {
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
               placeholder="کافه گلستان"
-              className={`w-full border rounded-md px-4 py-2.5 bg-white focus:outline-none focus:ring-2 transition-shadow ${
+              className={`w-full border rounded-xl px-4 py-2.5 bg-white focus:outline-none focus:ring-2 transition-shadow ${
                 fieldErrors.name ? "border-wine ring-wine/20" : "border-ink/20 focus:ring-gold/40"
               }`}
             />
@@ -113,7 +113,7 @@ export default function RestaurantOnboarding() {
             <select
               value={businessType}
               onChange={(e) => setBusinessType(e.target.value)}
-              className="w-full border border-ink/20 rounded-md px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
+              className="w-full border border-ink/20 rounded-xl px-4 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
             >
               <option value="">انتخاب کنید</option>
               {BUSINESS_TYPES.map((t) => (
@@ -127,7 +127,7 @@ export default function RestaurantOnboarding() {
           <div>
             <label className="block text-sm text-ink mb-1.5 font-medium">آدرس انگلیسی منو</label>
             <div
-              className={`flex items-center border rounded-md bg-white overflow-hidden focus-within:ring-2 transition-shadow ${
+              className={`flex items-center border rounded-xl bg-white overflow-hidden focus-within:ring-2 transition-shadow ${
                 fieldErrors.slug ? "border-wine ring-wine/20" : "border-ink/20 focus-within:ring-gold/40"
               }`}
             >
@@ -152,7 +152,7 @@ export default function RestaurantOnboarding() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-ink text-paper py-2.5 rounded-md font-medium hover:bg-ink/90 transition-colors disabled:opacity-60"
+            className="w-full bg-ink text-paper py-2.5 rounded-xl font-medium hover:bg-ink/90 transition-colors disabled:opacity-60"
           >
             {loading ? "در حال ساخت..." : "ساخت رستوران"}
           </button>

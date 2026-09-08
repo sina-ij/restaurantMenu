@@ -16,6 +16,13 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import {
+  Trash,
+  Camera,
+  QrCode,
+  PencilSimple,
+  DotsSixVertical,
+} from "@phosphor-icons/react";
 import { Toast, useToast } from "@/components/Toast";
 import { downloadMenuQrCode } from "@/lib/qrDownload";
 
@@ -299,14 +306,14 @@ export default function DashboardClient({
           <button
             onClick={downloadQrCode}
             disabled={generatingQr}
-            className="text-sm border border-ink/20 px-4 py-2 rounded-md hover:bg-ink/5 transition-colors disabled:opacity-60 flex items-center gap-1.5"
+            className="text-sm border border-ink/20 px-4 py-2 rounded-xl hover:bg-ink/5 transition-colors disabled:opacity-60 flex items-center gap-1.5"
           >
             <QrIcon />
             {generatingQr ? "در حال ساخت..." : "دانلود QR کد"}
           </button>
           <button
             onClick={copyMenuUrl}
-            className="text-sm border border-ink/20 px-4 py-2 rounded-md hover:bg-ink/5 transition-colors"
+            className="text-sm border border-ink/20 px-4 py-2 rounded-xl hover:bg-ink/5 transition-colors"
           >
             کپی لینک منو
           </button>
@@ -323,13 +330,13 @@ export default function DashboardClient({
               if (categoryError) setCategoryError("");
             }}
             placeholder="نام دسته‌ی جدید (مثلاً: نوشیدنی گرم)"
-            className={`flex-1 border rounded-md px-4 py-2 bg-white focus:outline-none focus:ring-2 transition-shadow ${
+            className={`flex-1 border rounded-xl px-4 py-2 bg-white focus:outline-none focus:ring-2 transition-shadow ${
               categoryError ? "border-wine ring-wine/20" : "border-ink/20 focus:ring-gold/40"
             }`}
           />
           <button
             type="submit"
-            className="bg-ink text-paper px-5 py-2 rounded-md hover:bg-ink/90 transition-colors"
+            className="bg-ink text-paper px-5 py-2 rounded-xl hover:bg-ink/90 transition-colors"
           >
             افزودن دسته
           </button>
@@ -370,63 +377,25 @@ export default function DashboardClient({
   );
 }
 
+// آیکون‌های داشبورد از کتابخانه‌ی Phosphor (نامِ محلی حفظ شده تا call-siteها ثابت بمانند).
 function TrashIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-4 w-4">
-      <path strokeWidth={1.5} strokeLinecap="round" d="M5 7h14M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2m2 0-1 13a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 7" />
-    </svg>
-  );
+  return <Trash className="h-4 w-4" weight="bold" />;
 }
 
 function CameraIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-4 w-4">
-      <path
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"
-      />
-      <circle cx="12" cy="13" r="3.2" strokeWidth={1.5} />
-    </svg>
-  );
+  return <Camera className="h-4 w-4" weight="bold" />;
 }
 
 function QrIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-4 w-4">
-      <rect x="3" y="3" width="7" height="7" strokeWidth={1.5} rx="1" />
-      <rect x="14" y="3" width="7" height="7" strokeWidth={1.5} rx="1" />
-      <rect x="3" y="14" width="7" height="7" strokeWidth={1.5} rx="1" />
-      <path strokeWidth={1.5} strokeLinecap="round" d="M14 14h3m4 0h0M14 18h3m-3 3h7v-4" />
-    </svg>
-  );
+  return <QrCode className="h-4 w-4" weight="bold" />;
 }
 
 function PencilIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="h-4 w-4">
-      <path
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="m16.5 4.5 3 3L8 19H5v-3L16.5 4.5Z"
-      />
-    </svg>
-  );
+  return <PencilSimple className="h-4 w-4" weight="bold" />;
 }
 
 function GripIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-      <circle cx="9" cy="6" r="1.4" />
-      <circle cx="15" cy="6" r="1.4" />
-      <circle cx="9" cy="12" r="1.4" />
-      <circle cx="15" cy="12" r="1.4" />
-      <circle cx="9" cy="18" r="1.4" />
-      <circle cx="15" cy="18" r="1.4" />
-    </svg>
-  );
+  return <DotsSixVertical className="h-4 w-4" weight="bold" />;
 }
 
 function SortableCategoryBlock(
@@ -605,9 +574,9 @@ function CategoryBlock({
           </button>
           <label className="relative flex-shrink-0 cursor-pointer group">
             {category.imageUrl ? (
-              <img src={category.imageUrl} alt={category.name} className="w-10 h-10 rounded-md object-cover" />
+              <img src={category.imageUrl} alt={category.name} className="w-10 h-10 rounded-xl object-cover" />
             ) : (
-              <span className="flex w-10 h-10 rounded-md bg-paper border border-ink/10 items-center justify-center text-muted group-hover:text-gold transition-colors">
+              <span className="flex w-10 h-10 rounded-xl bg-paper border border-ink/10 items-center justify-center text-muted group-hover:text-gold transition-colors">
                 <CameraIcon />
               </span>
             )}
@@ -620,7 +589,7 @@ function CategoryBlock({
                 autoFocus
                 value={nameDraft}
                 onChange={(e) => setNameDraft(e.target.value)}
-                className="border border-ink/20 rounded-md px-2 py-1 bg-white text-xl font-display font-semibold focus:outline-none focus:ring-2 focus:ring-gold/40"
+                className="border border-ink/20 rounded-xl px-2 py-1 bg-white text-xl font-display font-semibold focus:outline-none focus:ring-2 focus:ring-gold/40"
               />
               <button
                 type="submit"
@@ -678,7 +647,7 @@ function CategoryBlock({
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="bg-paper border border-ink/10 rounded-lg p-4 mb-4 space-y-3"
+          className="bg-paper border border-ink/10 rounded-2xl p-4 mb-4 space-y-3"
         >
           <div>
             <input
@@ -689,7 +658,7 @@ function CategoryBlock({
                 setName(e.target.value);
                 if (fieldErrors.name) setFieldErrors({ ...fieldErrors, name: undefined });
               }}
-              className={`w-full border rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 transition-shadow ${
+              className={`w-full border rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 transition-shadow ${
                 fieldErrors.name ? "border-wine ring-wine/20" : "border-ink/20 focus:ring-gold/40"
               }`}
             />
@@ -700,7 +669,7 @@ function CategoryBlock({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
-            className="w-full border border-ink/20 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
+            className="w-full border border-ink/20 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
           />
           <div>
             <input
@@ -712,7 +681,7 @@ function CategoryBlock({
                 if (fieldErrors.price) setFieldErrors({ ...fieldErrors, price: undefined });
               }}
               min={0}
-              className={`w-full border rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 transition-shadow ${
+              className={`w-full border rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 transition-shadow ${
                 fieldErrors.price ? "border-wine ring-wine/20" : "border-ink/20 focus:ring-gold/40"
               }`}
             />
@@ -722,14 +691,14 @@ function CategoryBlock({
             <input type="file" accept="image/*" onChange={handleImageChange} className="text-sm" />
             {uploading && <p className="text-sm text-muted mt-1">در حال آپلود...</p>}
             {imageUrl && (
-              <img src={imageUrl} alt="پیش‌نمایش" className="w-16 h-16 rounded-md object-cover mt-2" />
+              <img src={imageUrl} alt="پیش‌نمایش" className="w-16 h-16 rounded-xl object-cover mt-2" />
             )}
           </div>
 
           <button
             type="submit"
             disabled={saving}
-            className="bg-ink text-paper px-5 py-2 rounded-md hover:bg-ink/90 transition-colors disabled:opacity-60"
+            className="bg-ink text-paper px-5 py-2 rounded-xl hover:bg-ink/90 transition-colors disabled:opacity-60"
           >
             {saving ? "در حال ذخیره..." : "ذخیره آیتم"}
           </button>
@@ -803,7 +772,7 @@ function SortableItemRow({
         <GripIcon />
       </button>
       {item.imageUrl && (
-        <img src={item.imageUrl} alt={item.name} className="w-12 h-12 rounded-md object-cover flex-shrink-0" />
+        <img src={item.imageUrl} alt={item.name} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" />
       )}
       <div className="flex-1 min-w-0">
         <p className="text-ink font-medium">{item.name}</p>
@@ -909,7 +878,7 @@ function ItemEditForm({
     <form
       onSubmit={handleSubmit}
       noValidate
-      className="bg-paper border border-ink/10 rounded-lg p-4 space-y-3"
+      className="bg-paper border border-ink/10 rounded-2xl p-4 space-y-3"
     >
       <div>
         <input
@@ -920,7 +889,7 @@ function ItemEditForm({
             setName(e.target.value);
             if (fieldErrors.name) setFieldErrors({ ...fieldErrors, name: undefined });
           }}
-          className={`w-full border rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 transition-shadow ${
+          className={`w-full border rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 transition-shadow ${
             fieldErrors.name ? "border-wine ring-wine/20" : "border-ink/20 focus:ring-gold/40"
           }`}
         />
@@ -931,7 +900,7 @@ function ItemEditForm({
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         rows={2}
-        className="w-full border border-ink/20 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
+        className="w-full border border-ink/20 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-gold/40"
       />
       <div>
         <input
@@ -943,7 +912,7 @@ function ItemEditForm({
             if (fieldErrors.price) setFieldErrors({ ...fieldErrors, price: undefined });
           }}
           min={0}
-          className={`w-full border rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 transition-shadow ${
+          className={`w-full border rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 transition-shadow ${
             fieldErrors.price ? "border-wine ring-wine/20" : "border-ink/20 focus:ring-gold/40"
           }`}
         />
@@ -953,7 +922,7 @@ function ItemEditForm({
         <input type="file" accept="image/*" onChange={handleImageChange} className="text-sm" />
         {uploading && <p className="text-sm text-muted mt-1">در حال آپلود...</p>}
         {imageUrl && (
-          <img src={imageUrl} alt="پیش‌نمایش" className="w-16 h-16 rounded-md object-cover mt-2" />
+          <img src={imageUrl} alt="پیش‌نمایش" className="w-16 h-16 rounded-xl object-cover mt-2" />
         )}
       </div>
 
@@ -961,7 +930,7 @@ function ItemEditForm({
         <button
           type="submit"
           disabled={saving}
-          className="bg-ink text-paper px-5 py-2 rounded-md hover:bg-ink/90 transition-colors disabled:opacity-60"
+          className="bg-ink text-paper px-5 py-2 rounded-xl hover:bg-ink/90 transition-colors disabled:opacity-60"
         >
           {saving ? "در حال ذخیره..." : "ذخیره تغییرات"}
         </button>

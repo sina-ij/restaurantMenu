@@ -1,9 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { Info, Phone, ForkKnife } from "@phosphor-icons/react/dist/ssr";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BackgroundPattern } from "@/components/BackgroundPattern";
 import { MenuItemCard } from "@/components/MenuItemCard";
+import { CategoryNav } from "@/components/CategoryNav";
+import { Reveal, RevealStagger, RevealItem } from "@/components/Reveal";
 import { hexToRgbTriplet } from "@/lib/color";
 
 export const revalidate = 0;
@@ -67,79 +70,80 @@ export default async function PublicMenuPage({
       <div className="fixed top-4 left-4 z-20">
         <ThemeToggle />
       </div>
-      <header className="relative border-b border-ink/10 px-6 pt-12 pb-8 text-center">
-        {restaurant.logoUrl ? (
-          <img
-            src={restaurant.logoUrl}
-            alt={restaurant.name}
-            className="w-16 h-16 rounded-full object-cover mx-auto mb-4 border-2 border-white shadow-soft"
-          />
-        ) : (
-          <div className="flex items-center justify-center gap-2 text-gold mb-4" aria-hidden="true">
-            <span className="h-px w-8 bg-gold/40" />
-            <span className="h-1.5 w-1.5 rotate-45 bg-gold" />
-            <span className="h-px w-8 bg-gold/40" />
-          </div>
-        )}
-        {restaurant.businessType && (
-          <span className="inline-block text-xs px-3 py-1 rounded-full border border-gold/40 text-gold mb-2">
-            {restaurant.businessType}
-          </span>
-        )}
-        <h1 className="font-display font-semibold text-3xl text-ink">{restaurant.name}</h1>
-        {restaurant.description && (
-          <p className="text-muted mt-2 text-sm max-w-md mx-auto leading-relaxed">
-            {restaurant.description}
-          </p>
-        )}
-        <Link
-          href={`/menu/${restaurant.slug}/about`}
-          className="inline-flex items-center gap-1.5 mt-4 text-xs px-3.5 py-1.5 rounded-full border border-gold/40 text-ink/80 hover:bg-gold/10 transition-colors"
-        >
-          درباره ما
-        </Link>
+      <header className="relative overflow-hidden border-b border-ink/10 px-6 pt-14 pb-10 text-center">
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-gold/15 to-transparent"
+          aria-hidden="true"
+        />
+        <Reveal className="relative" y={12}>
+          {restaurant.logoUrl ? (
+            <img
+              src={restaurant.logoUrl}
+              alt={restaurant.name}
+              className="mx-auto mb-4 h-20 w-20 rounded-full border-2 border-white object-cover shadow-soft"
+            />
+          ) : (
+            <span className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gold/10 text-gold shadow-soft">
+              <ForkKnife className="h-7 w-7" weight="duotone" />
+            </span>
+          )}
+          {restaurant.businessType && (
+            <span className="mb-2 inline-block rounded-full border border-gold/40 px-3 py-1 text-xs text-gold">
+              {restaurant.businessType}
+            </span>
+          )}
+          <h1 className="font-display text-3xl font-semibold text-ink">{restaurant.name}</h1>
+          {restaurant.description && (
+            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+              {restaurant.description}
+            </p>
+          )}
+          <Link
+            href={`/menu/${restaurant.slug}/about`}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-gold/40 px-3.5 py-1.5 text-xs text-ink/80 transition-colors hover:bg-gold/10"
+          >
+            <Info className="h-4 w-4" weight="duotone" />
+            درباره ما
+          </Link>
+        </Reveal>
       </header>
 
       {categoriesWithItems.length === 0 ? (
-        <p className="relative text-center text-muted py-20">
-          منو هنوز آماده نشده، به‌زودی برمی‌گردیم.
-        </p>
+        <div className="relative flex flex-col items-center gap-4 py-24 text-center">
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gold/10 text-gold">
+            <ForkKnife className="h-7 w-7" weight="duotone" />
+          </span>
+          <p className="text-muted">منو هنوز آماده نشده، به‌زودی برمی‌گردیم.</p>
+        </div>
       ) : (
         <>
-          <nav className="sticky top-0 bg-paper/95 backdrop-blur border-b border-ink/10 overflow-x-auto whitespace-nowrap px-4 py-3 flex gap-2 z-10">
-            {categoriesWithItems.map((cat) => (
-              <a
-                key={cat.id}
-                href={`#cat-${cat.id}`}
-                className="text-sm px-4 py-1.5 rounded-full border border-ink/15 text-ink hover:bg-gold hover:border-gold hover:text-paper transition-colors font-medium"
-              >
-                {cat.name}
-              </a>
-            ))}
-          </nav>
+          <CategoryNav
+            categories={categoriesWithItems.map((c) => ({ id: c.id, name: c.name }))}
+          />
 
-          <div className="relative max-w-xl mx-auto px-4 py-10 space-y-14">
+          <div className="relative mx-auto max-w-xl space-y-14 px-4 py-10">
             {categoriesWithItems.map((cat) => (
               <section key={cat.id} id={`cat-${cat.id}`} className="scroll-mt-20">
-                <div className="flex items-center gap-3 mb-6">
+                <Reveal className="mb-6 flex items-center gap-3" y={12}>
                   {cat.imageUrl && (
                     <img
                       src={cat.imageUrl}
                       alt={cat.name}
-                      className="w-10 h-10 rounded-md object-cover flex-shrink-0"
+                      className="h-10 w-10 flex-shrink-0 rounded-xl object-cover"
                     />
                   )}
-                  <h2 className="font-display font-semibold text-2xl text-ink whitespace-nowrap">
+                  <h2 className="whitespace-nowrap font-display text-2xl font-semibold text-ink">
                     {cat.name}
                   </h2>
                   <span className="h-px flex-1 bg-gradient-to-l from-gold/40 to-transparent" />
-                  <span className="h-1.5 w-1.5 rotate-45 bg-gold/50 flex-shrink-0" aria-hidden="true" />
-                </div>
-                <div className="space-y-5">
+                </Reveal>
+                <RevealStagger className="space-y-5">
                   {cat.items.map((item) => (
-                    <MenuItemCard key={item.id} item={item} />
+                    <RevealItem key={item.id}>
+                      <MenuItemCard item={item} />
+                    </RevealItem>
                   ))}
-                </div>
+                </RevealStagger>
               </section>
             ))}
           </div>
@@ -147,7 +151,8 @@ export default async function PublicMenuPage({
       )}
 
       {restaurant.phone && (
-        <footer className="relative text-center text-muted text-sm py-8 border-t border-ink/10">
+        <footer className="relative flex items-center justify-center gap-2 border-t border-ink/10 py-8 text-center text-sm text-muted">
+          <Phone className="h-4 w-4 text-gold" weight="duotone" />
           تماس: <span dir="ltr">{restaurant.phone}</span>
         </footer>
       )}
