@@ -73,7 +73,7 @@ export function WelcomeSplash({
               <img
                 src={logoUrl}
                 alt={name}
-                className="mb-5 h-28 w-28 rounded-full bg-white object-contain p-2.5 shadow-lift ring-1 ring-ink/10"
+                className="mb-5 h-32 w-32 object-contain drop-shadow-lg"
               />
             ) : (
               <span className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-gold/10 text-gold shadow-soft">
