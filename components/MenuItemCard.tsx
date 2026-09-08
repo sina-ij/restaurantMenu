@@ -51,9 +51,11 @@ export function MenuItemCard({ item }: { item: Item }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-3">
             <h3 className="font-body font-semibold text-ink">{item.name}</h3>
-            <span className="whitespace-nowrap font-body font-medium tabular-nums text-gold">
-              {formatPrice(item.price)} تومان
-            </span>
+            {item.price > 0 && (
+              <span className="whitespace-nowrap font-body font-medium tabular-nums text-gold">
+                {formatPrice(item.price)} تومان
+              </span>
+            )}
           </div>
           {item.description && (
             <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted">{item.description}</p>
@@ -89,9 +91,11 @@ export function MenuItemCard({ item }: { item: Item }) {
             <div className="p-5">
               <div className="mb-2 flex items-baseline justify-between gap-3">
                 <h3 className="font-display text-xl font-semibold text-ink">{item.name}</h3>
-                <span className="whitespace-nowrap font-body font-semibold tabular-nums text-gold">
-                  {formatPrice(item.price)} تومان
-                </span>
+                {item.price > 0 && (
+                  <span className="whitespace-nowrap font-body font-semibold tabular-nums text-gold">
+                    {formatPrice(item.price)} تومان
+                  </span>
+                )}
               </div>
               {item.description && (
                 <p className="text-sm leading-relaxed text-muted">{item.description}</p>
