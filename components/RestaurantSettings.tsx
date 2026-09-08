@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Toast, useToast } from "@/components/Toast";
 import { AccentColorPicker } from "@/components/AccentColorPicker";
+import { ImageUpload } from "@/components/ImageUpload";
 import { BUSINESS_TYPES } from "@/lib/color";
 
 export type RestaurantInfo = {
@@ -50,26 +51,9 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
   const [logoUrl, setLogoUrl] = useState(restaurant.logoUrl ?? "");
   const [businessType, setBusinessType] = useState(restaurant.businessType ?? "");
   const [accentColor, setAccentColor] = useState(restaurant.accentColor);
-  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [saving, setSaving] = useState(false);
   const [nameError, setNameError] = useState("");
   const [slugError, setSlugError] = useState("");
-
-  async function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadingLogo(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: formData });
-    const data = await parseResponse(res);
-    setUploadingLogo(false);
-    if (res.ok) {
-      setLogoUrl(data.url);
-    } else {
-      showToast(data.error || "آپلود لوگو با خطا مواجه شد", "error");
-    }
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -127,21 +111,9 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
         noValidate
         className="bg-card border border-ink/10 rounded-2xl shadow-soft p-6 space-y-4"
       >
-        <div className="flex items-center gap-4">
-          <div className="flex-shrink-0">
-            {logoUrl ? (
-              <img src={logoUrl} alt="لوگو" className="w-16 h-16 rounded-full object-cover" />
-            ) : (
-              <div className="w-16 h-16 rounded-full bg-paper border border-ink/10 flex items-center justify-center text-muted text-xs">
-                بدون لوگو
-              </div>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm text-ink mb-1.5 font-medium">لوگوی کافه</label>
-            <input type="file" accept="image/*" onChange={handleLogoChange} className="text-sm" />
-            {uploadingLogo && <p className="text-sm text-muted mt-1">در حال آپلود...</p>}
-          </div>
+        <div>
+          <label className="block text-sm text-ink mb-1.5 font-medium">لوگوی کافه</label>
+          <ImageUpload value={logoUrl} onChange={setLogoUrl} label="افزودن لوگو" hint="مربعی بهتر است؛ jpg، png یا webp" />
         </div>
 
         <div>

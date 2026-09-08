@@ -24,6 +24,7 @@ import {
   DotsSixVertical,
 } from "@phosphor-icons/react";
 import { Toast, useToast } from "@/components/Toast";
+import { ImageUpload } from "@/components/ImageUpload";
 import { downloadMenuQrCode } from "@/lib/qrDownload";
 
 type MenuItem = {
@@ -466,8 +467,7 @@ function CategoryBlock({
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [uploading, setUploading] = useState(false);
-  const [uploadingCategoryImage, setUploadingCategoryImage] = useState(false);
+  const [showImageEdit, setShowImageEdit] = useState(false);
   const [saving, setSaving] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{ name?: string; price?: string }>({});
   const [editingName, setEditingName] = useState(false);
@@ -485,38 +485,6 @@ function CategoryBlock({
       setEditingName(false);
     } else {
       showToast(result.error || "خطایی رخ داد. لطفاً دوباره تلاش کنید", "error");
-    }
-  }
-
-  async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: formData });
-    const data = await parseResponse(res);
-    setUploading(false);
-    if (res.ok) {
-      setImageUrl(data.url);
-    } else {
-      showToast(data.error || "آپلود عکس با خطا مواجه شد", "error");
-    }
-  }
-
-  async function handleCategoryImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadingCategoryImage(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: formData });
-    const data = await parseResponse(res);
-    setUploadingCategoryImage(false);
-    if (res.ok) {
-      onUpdateImage(category.id, data.url);
-    } else {
-      showToast(data.error || "آپلود عکس با خطا مواجه شد", "error");
     }
   }
 
@@ -561,8 +529,8 @@ function CategoryBlock({
 
   return (
     <section className="border border-ink/10 rounded-xl p-5 bg-card shadow-soft">
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-wrap justify-between items-center gap-y-2 mb-4">
+        <div className="flex items-center gap-3 min-w-0">
           <button
             type="button"
             className="text-muted hover:text-ink cursor-grab active:cursor-grabbing touch-none"
@@ -572,7 +540,13 @@ function CategoryBlock({
           >
             <GripIcon />
           </button>
-          <label className="relative flex-shrink-0 cursor-pointer group">
+          <button
+            type="button"
+            onClick={() => setShowImageEdit((v) => !v)}
+            className="relative flex-shrink-0 group"
+            aria-label="تغییر تصویر دسته"
+            title="تغییر تصویر دسته"
+          >
             {category.imageUrl ? (
               <img src={category.imageUrl} alt={category.name} className="w-10 h-10 rounded-xl object-cover" />
             ) : (
@@ -580,16 +554,18 @@ function CategoryBlock({
                 <CameraIcon />
               </span>
             )}
-            <input type="file" accept="image/*" onChange={handleCategoryImageChange} className="hidden" />
-          </label>
+            <span className="absolute -bottom-1 -left-1 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-paper ring-2 ring-card">
+              <Camera className="h-2.5 w-2.5" weight="fill" />
+            </span>
+          </button>
           {editingName ? (
-            <form onSubmit={handleRenameSubmit} className="flex items-center gap-2">
+            <form onSubmit={handleRenameSubmit} className="flex flex-wrap items-center gap-2 min-w-0">
               <input
                 type="text"
                 autoFocus
                 value={nameDraft}
                 onChange={(e) => setNameDraft(e.target.value)}
-                className="border border-ink/20 rounded-xl px-2 py-1 bg-white text-xl font-display font-semibold focus:outline-none focus:ring-2 focus:ring-gold/40"
+                className="min-w-0 w-32 sm:w-44 border border-ink/20 rounded-xl px-2 py-1 bg-white text-lg sm:text-xl font-display font-semibold focus:outline-none focus:ring-2 focus:ring-gold/40"
               />
               <button
                 type="submit"
@@ -610,8 +586,8 @@ function CategoryBlock({
               </button>
             </form>
           ) : (
-            <div className="flex items-center gap-2">
-              <h2 className="font-display font-semibold text-xl text-ink">{category.name}</h2>
+            <div className="flex items-center gap-2 min-w-0">
+              <h2 className="font-display font-semibold text-xl text-ink truncate">{category.name}</h2>
               <button
                 type="button"
                 onClick={() => {
@@ -625,7 +601,6 @@ function CategoryBlock({
               </button>
             </div>
           )}
-          {uploadingCategoryImage && <span className="text-xs text-muted">در حال آپلود...</span>}
         </div>
         <div className="flex gap-3 items-center">
           <button
@@ -642,6 +617,18 @@ function CategoryBlock({
           </button>
         </div>
       </div>
+
+      {showImageEdit && (
+        <div className="bg-paper border border-ink/10 rounded-2xl p-4 mb-4">
+          <label className="mb-2 block text-sm font-medium text-ink">تصویرِ دسته (اختیاری)</label>
+          <ImageUpload
+            value={category.imageUrl ?? ""}
+            onChange={(url) => onUpdateImage(category.id, url)}
+            label="افزودن تصویرِ دسته"
+            hint="کنارِ نامِ دسته نمایش داده می‌شود"
+          />
+        </div>
+      )}
 
       {showForm && (
         <form
@@ -687,13 +674,7 @@ function CategoryBlock({
             />
             {fieldErrors.price && <p className="text-wine text-xs mt-1">{fieldErrors.price}</p>}
           </div>
-          <div>
-            <input type="file" accept="image/*" onChange={handleImageChange} className="text-sm" />
-            {uploading && <p className="text-sm text-muted mt-1">در حال آپلود...</p>}
-            {imageUrl && (
-              <img src={imageUrl} alt="پیش‌نمایش" className="w-16 h-16 rounded-xl object-cover mt-2" />
-            )}
-          </div>
+          <ImageUpload value={imageUrl} onChange={setImageUrl} label="افزودن عکسِ آیتم" />
 
           <button
             type="submit"
@@ -828,25 +809,8 @@ function ItemEditForm({
   const [description, setDescription] = useState(item.description ?? "");
   const [price, setPrice] = useState(String(item.price));
   const [imageUrl, setImageUrl] = useState(item.imageUrl ?? "");
-  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{ name?: string; price?: string }>({});
-
-  async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    const res = await fetch("/api/upload", { method: "POST", body: formData });
-    const data = await parseResponse(res);
-    setUploading(false);
-    if (res.ok) {
-      setImageUrl(data.url);
-    } else {
-      showToast(data.error || "آپلود عکس با خطا مواجه شد", "error");
-    }
-  }
 
   function validate() {
     const errors: { name?: string; price?: string } = {};
@@ -918,13 +882,7 @@ function ItemEditForm({
         />
         {fieldErrors.price && <p className="text-wine text-xs mt-1">{fieldErrors.price}</p>}
       </div>
-      <div>
-        <input type="file" accept="image/*" onChange={handleImageChange} className="text-sm" />
-        {uploading && <p className="text-sm text-muted mt-1">در حال آپلود...</p>}
-        {imageUrl && (
-          <img src={imageUrl} alt="پیش‌نمایش" className="w-16 h-16 rounded-xl object-cover mt-2" />
-        )}
-      </div>
+      <ImageUpload value={imageUrl} onChange={setImageUrl} label="افزودن عکسِ آیتم" />
 
       <div className="flex gap-2">
         <button

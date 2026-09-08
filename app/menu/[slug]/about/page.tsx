@@ -5,7 +5,7 @@ import { MapPin, Phone, Clock, ForkKnife, NavigationArrow, ArrowRight } from "@p
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BackgroundPattern } from "@/components/BackgroundPattern";
 import { Reveal } from "@/components/Reveal";
-import { hexToRgbTriplet } from "@/lib/color";
+import { menuThemeStyle } from "@/lib/color";
 
 export const revalidate = 0;
 
@@ -19,10 +19,8 @@ export default async function AboutPage({ params }: { params: { slug: string } }
   const hasInfo = restaurant.address || restaurant.phone || restaurant.workingHours;
 
   return (
-    <main
-      className="relative min-h-screen bg-paper"
-      style={{ "--color-gold": hexToRgbTriplet(restaurant.accentColor) } as React.CSSProperties}
-    >
+    <main className="relative min-h-screen bg-paper">
+      <style dangerouslySetInnerHTML={{ __html: menuThemeStyle(restaurant.accentColor) }} />
       <BackgroundPattern opacity={0.5} />
       <div className="fixed top-4 left-4 z-20">
         <ThemeToggle />

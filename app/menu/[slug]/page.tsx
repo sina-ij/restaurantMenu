@@ -7,7 +7,7 @@ import { BackgroundPattern } from "@/components/BackgroundPattern";
 import { MenuItemCard } from "@/components/MenuItemCard";
 import { CategoryNav } from "@/components/CategoryNav";
 import { Reveal, RevealStagger, RevealItem } from "@/components/Reveal";
-import { hexToRgbTriplet } from "@/lib/color";
+import { menuThemeStyle } from "@/lib/color";
 
 export const revalidate = 0;
 
@@ -62,10 +62,8 @@ export default async function PublicMenuPage({
   );
 
   return (
-    <main
-      className="relative min-h-screen bg-paper"
-      style={{ "--color-gold": hexToRgbTriplet(restaurant.accentColor) } as React.CSSProperties}
-    >
+    <main className="relative min-h-screen bg-paper">
+      <style dangerouslySetInnerHTML={{ __html: menuThemeStyle(restaurant.accentColor) }} />
       <BackgroundPattern opacity={0.5} />
       <div className="fixed top-4 left-4 z-20">
         <ThemeToggle />
