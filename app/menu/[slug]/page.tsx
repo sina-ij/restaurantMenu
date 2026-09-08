@@ -90,7 +90,7 @@ export default async function PublicMenuPage({
             <img
               src={restaurant.logoUrl}
               alt={restaurant.name}
-              className="mx-auto mb-4 h-24 w-24 object-contain drop-shadow-md"
+              className="mx-auto mb-4 h-28 w-28 object-contain drop-shadow-md"
             />
           ) : (
             <span className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gold/10 text-gold shadow-soft">
@@ -102,7 +102,7 @@ export default async function PublicMenuPage({
               {restaurant.businessType}
             </span>
           )}
-          <h1 className="font-display text-3xl font-semibold text-ink">{restaurant.name}</h1>
+          <h1 className="font-brand text-4xl text-ink md:text-5xl">{restaurant.name}</h1>
           {restaurant.description && (
             <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
               {restaurant.description}

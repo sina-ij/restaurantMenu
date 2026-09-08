@@ -22,6 +22,7 @@ const config: Config = {
       fontFamily: {
         display: ["var(--font-naskh)", "serif"],
         body: ["var(--font-vazirmatn)", "sans-serif"],
+        brand: ["var(--font-brand)", "var(--font-naskh)", "serif"],
       },
       boxShadow: {
         soft: "0 1px 2px rgba(34, 26, 19, 0.06), 0 8px 24px -12px rgba(34, 26, 19, 0.18)",

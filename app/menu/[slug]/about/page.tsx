@@ -37,7 +37,7 @@ export default async function AboutPage({ params }: { params: { slug: string } }
             <img
               src={restaurant.logoUrl}
               alt={restaurant.name}
-              className="mx-auto mb-4 h-24 w-24 object-contain drop-shadow-md"
+              className="mx-auto mb-4 h-28 w-28 object-contain drop-shadow-md"
             />
           ) : (
             <span className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gold/10 text-gold shadow-soft">
@@ -49,7 +49,7 @@ export default async function AboutPage({ params }: { params: { slug: string } }
               {restaurant.businessType}
             </span>
           )}
-          <h1 className="font-display text-3xl font-semibold text-ink">{restaurant.name}</h1>
+          <h1 className="font-brand text-4xl text-ink md:text-5xl">{restaurant.name}</h1>
           <p className="mt-2 text-sm text-muted">درباره ما</p>
         </div>
       </header>

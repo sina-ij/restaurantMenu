@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Vazirmatn, Noto_Naskh_Arabic } from "next/font/google";
+import { Vazirmatn, Noto_Naskh_Arabic, Lalezar } from "next/font/google";
 import "./globals.css";
 
 const vazirmatn = Vazirmatn({
@@ -12,6 +12,13 @@ const notoNaskh = Noto_Naskh_Arabic({
   subsets: ["arabic", "latin"],
   variable: "--font-naskh",
   weight: ["500", "600", "700"],
+});
+
+// فونتِ نامِ برند: نمایشی و متمایز، مناسبِ تابلو/نامِ رستوران.
+const lalezar = Lalezar({
+  subsets: ["arabic", "latin"],
+  variable: "--font-brand",
+  weight: ["400"],
 });
 
 export const metadata: Metadata = {
@@ -33,7 +40,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${vazirmatn.variable} ${notoNaskh.variable} font-body bg-paper text-ink`}>
+      <body className={`${vazirmatn.variable} ${notoNaskh.variable} ${lalezar.variable} font-body bg-paper text-ink`}>
         {children}
       </body>
     </html>

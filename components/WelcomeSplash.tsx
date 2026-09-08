@@ -73,7 +73,7 @@ export function WelcomeSplash({
               <img
                 src={logoUrl}
                 alt={name}
-                className="mb-5 h-32 w-32 object-contain drop-shadow-lg"
+                className="mb-5 h-36 w-36 object-contain drop-shadow-lg"
               />
             ) : (
               <span className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-gold/10 text-gold shadow-soft">
@@ -86,7 +86,7 @@ export function WelcomeSplash({
                 {businessType}
               </span>
             )}
-            <h1 className="font-display text-3xl font-semibold text-ink md:text-4xl">{name}</h1>
+            <h1 className="font-brand text-4xl text-ink md:text-5xl">{name}</h1>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted">
               {description || "به منوی ما خوش آمدید"}
             </p>
