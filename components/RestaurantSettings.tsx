@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Toast, useToast } from "@/components/Toast";
 import { AccentColorPicker } from "@/components/AccentColorPicker";
+import { PatternPicker } from "@/components/PatternPicker";
 import { ImageUpload } from "@/components/ImageUpload";
 import { BUSINESS_TYPES } from "@/lib/color";
 
@@ -16,8 +17,10 @@ export type RestaurantInfo = {
   address: string | null;
   workingHours: string | null;
   locationUrl: string | null;
+  instagram: string | null;
   businessType: string | null;
   accentColor: string;
+  pattern: string | null;
 };
 
 async function parseResponse(res: Response) {
@@ -48,9 +51,11 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
   const [address, setAddress] = useState(restaurant.address ?? "");
   const [workingHours, setWorkingHours] = useState(restaurant.workingHours ?? "");
   const [locationUrl, setLocationUrl] = useState(restaurant.locationUrl ?? "");
+  const [instagram, setInstagram] = useState(restaurant.instagram ?? "");
   const [logoUrl, setLogoUrl] = useState(restaurant.logoUrl ?? "");
   const [businessType, setBusinessType] = useState(restaurant.businessType ?? "");
   const [accentColor, setAccentColor] = useState(restaurant.accentColor);
+  const [pattern, setPattern] = useState(restaurant.pattern ?? "dots");
   const [saving, setSaving] = useState(false);
   const [nameError, setNameError] = useState("");
   const [slugError, setSlugError] = useState("");
@@ -87,9 +92,11 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
         address,
         workingHours,
         locationUrl,
+        instagram,
         logoUrl,
         businessType,
         accentColor,
+        pattern,
       }),
     });
     const data = await parseResponse(res);
@@ -232,6 +239,29 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
             placeholder="https://maps.google.com/..."
             className="w-full border border-ink/20 rounded-xl px-4 py-2 bg-white text-left focus:outline-none focus:ring-2 focus:ring-gold/40"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm text-ink mb-1.5 font-medium">اینستاگرام</label>
+          <div className="flex items-center border border-ink/20 rounded-xl bg-white overflow-hidden focus-within:ring-2 focus-within:ring-gold/40 transition-shadow">
+            <span className="text-muted text-sm ps-3 pe-2 border-e border-ink/10" dir="ltr">
+              @
+            </span>
+            <input
+              type="text"
+              dir="ltr"
+              value={instagram}
+              onChange={(e) => setInstagram(e.target.value.replace(/^@+/, ""))}
+              placeholder="mycafe"
+              className="flex-1 min-w-0 px-3 py-2 bg-white text-left focus:outline-none"
+            />
+          </div>
+          <p className="text-muted text-xs mt-1">فقط آی‌دی (بدون @) یا لینک کامل</p>
+        </div>
+
+        <div>
+          <label className="block text-sm text-ink mb-2 font-medium">طرحِ پس‌زمینه‌ی منو</label>
+          <PatternPicker value={pattern} onChange={setPattern} />
         </div>
 
         <button

@@ -19,8 +19,10 @@ export default async function SettingsPage() {
         address: restaurant.address,
         workingHours: restaurant.workingHours,
         locationUrl: restaurant.locationUrl,
+        instagram: restaurant.instagram,
         businessType: restaurant.businessType,
         accentColor: restaurant.accentColor,
+        pattern: restaurant.pattern,
       }}
     />
   );

@@ -77,6 +77,8 @@ export async function PUT(req: NextRequest) {
     logoUrl?: string;
     businessType?: string;
     accentColor?: string;
+    instagram?: string;
+    pattern?: string;
   };
   try {
     body = await req.json();
@@ -129,6 +131,8 @@ export async function PUT(req: NextRequest) {
         logoUrl: body.logoUrl !== undefined ? body.logoUrl || null : restaurant.logoUrl,
         businessType: body.businessType?.trim() || null,
         accentColor: body.accentColor ?? restaurant.accentColor,
+        instagram: body.instagram?.trim() || null,
+        pattern: body.pattern?.trim() || null,
       },
     });
     return NextResponse.json(updated);

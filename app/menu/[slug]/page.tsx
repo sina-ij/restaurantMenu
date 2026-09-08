@@ -1,13 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Info, Phone, ForkKnife } from "@phosphor-icons/react/dist/ssr";
+import { Info, Phone, ForkKnife, InstagramLogo } from "@phosphor-icons/react/dist/ssr";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BackgroundPattern } from "@/components/BackgroundPattern";
 import { MenuItemCard } from "@/components/MenuItemCard";
 import { CategoryNav } from "@/components/CategoryNav";
+import { WelcomeSplash } from "@/components/WelcomeSplash";
 import { Reveal, RevealStagger, RevealItem } from "@/components/Reveal";
 import { menuThemeStyle } from "@/lib/color";
+import { instagramUrl } from "@/lib/links";
 
 export const revalidate = 0;
 
@@ -64,7 +66,17 @@ export default async function PublicMenuPage({
   return (
     <main className="relative min-h-screen bg-paper">
       <style dangerouslySetInnerHTML={{ __html: menuThemeStyle(restaurant.accentColor) }} />
-      <BackgroundPattern opacity={0.5} />
+      <BackgroundPattern opacity={0.5} pattern={restaurant.pattern} />
+      <WelcomeSplash
+        slug={restaurant.slug}
+        name={restaurant.name}
+        logoUrl={restaurant.logoUrl}
+        businessType={restaurant.businessType}
+        description={restaurant.description}
+        instagram={restaurant.instagram}
+        phone={restaurant.phone}
+        pattern={restaurant.pattern}
+      />
       <div className="fixed top-4 left-4 z-20">
         <ThemeToggle />
       </div>
@@ -96,13 +108,26 @@ export default async function PublicMenuPage({
               {restaurant.description}
             </p>
           )}
-          <Link
-            href={`/menu/${restaurant.slug}/about`}
-            className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-gold/40 px-3.5 py-1.5 text-xs text-ink/80 transition-colors hover:bg-gold/10"
-          >
-            <Info className="h-4 w-4" weight="duotone" />
-            درباره ما
-          </Link>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            <Link
+              href={`/menu/${restaurant.slug}/about`}
+              className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 px-3.5 py-1.5 text-xs text-ink/80 transition-colors hover:bg-gold/10"
+            >
+              <Info className="h-4 w-4" weight="duotone" />
+              درباره ما
+            </Link>
+            {instagramUrl(restaurant.instagram) && (
+              <a
+                href={instagramUrl(restaurant.instagram)!}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 px-3.5 py-1.5 text-xs text-ink/80 transition-colors hover:bg-gold/10"
+              >
+                <InstagramLogo className="h-4 w-4" weight="duotone" />
+                اینستاگرام
+              </a>
+            )}
+          </div>
         </Reveal>
       </header>
 

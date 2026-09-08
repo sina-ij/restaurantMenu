@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { MapPin, Phone, Clock, ForkKnife, NavigationArrow, ArrowRight } from "@phosphor-icons/react/dist/ssr";
+import { MapPin, Phone, Clock, ForkKnife, NavigationArrow, ArrowRight, InstagramLogo } from "@phosphor-icons/react/dist/ssr";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BackgroundPattern } from "@/components/BackgroundPattern";
 import { Reveal } from "@/components/Reveal";
 import { menuThemeStyle } from "@/lib/color";
+import { instagramUrl } from "@/lib/links";
 
 export const revalidate = 0;
 
@@ -17,11 +18,12 @@ export default async function AboutPage({ params }: { params: { slug: string } }
   if (!restaurant) return notFound();
 
   const hasInfo = restaurant.address || restaurant.phone || restaurant.workingHours;
+  const ig = instagramUrl(restaurant.instagram);
 
   return (
     <main className="relative min-h-screen bg-paper">
       <style dangerouslySetInnerHTML={{ __html: menuThemeStyle(restaurant.accentColor) }} />
-      <BackgroundPattern opacity={0.5} />
+      <BackgroundPattern opacity={0.5} pattern={restaurant.pattern} />
       <div className="fixed top-4 left-4 z-20">
         <ThemeToggle />
       </div>
@@ -57,7 +59,7 @@ export default async function AboutPage({ params }: { params: { slug: string } }
           <p className="mb-8 text-center leading-relaxed text-ink/90">{restaurant.description}</p>
         )}
 
-        {hasInfo && (
+        {(hasInfo || ig) && (
           <div className="mb-8 grid gap-3">
             {restaurant.address && (
               <div className="flex items-start gap-3 rounded-2xl border border-ink/10 bg-card p-4 text-ink/90 shadow-soft">
@@ -87,6 +89,21 @@ export default async function AboutPage({ params }: { params: { slug: string } }
                 </span>
                 <span className="leading-relaxed">{restaurant.workingHours}</span>
               </div>
+            )}
+            {ig && (
+              <a
+                href={ig}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 rounded-2xl border border-ink/10 bg-card p-4 text-ink/90 shadow-soft transition-colors hover:bg-ink/5"
+              >
+                <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gold/10 text-gold">
+                  <InstagramLogo className="h-5 w-5" weight="duotone" />
+                </span>
+                <span dir="ltr" className="leading-relaxed">
+                  {restaurant.instagram?.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/^(?!@)/, "@")}
+                </span>
+              </a>
             )}
           </div>
         )}
