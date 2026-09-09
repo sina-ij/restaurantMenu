@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900" width="900" height="900" role="img">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#154331"/>
+      <stop offset="1" stop-color="#0b2c1d"/>
+    </linearGradient>
+    <pattern id="dots" x="21" y="21" width="60" height="60" patternUnits="userSpaceOnUse">
+      <circle cx="30" cy="30" r="3.2" fill="#f5edc9" opacity="0.14"/>
+    </pattern>
+    <radialGradient id="vignette" cx="0.5" cy="0.46" r="0.72">
+      <stop offset="0.55" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.28"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="900" height="900" fill="url(#bg)"/>
+  <rect width="900" height="900" fill="url(#dots)"/>
+
+  <!-- لوزیِ کم‌رنگ، اشاره به نشانِ برند -->
+  <rect x="215" y="215" width="470" height="470" rx="70"
+        transform="rotate(45 450 450)"
+        fill="none" stroke="#cfb16b" stroke-width="3" opacity="0.16"/>
+
+  <rect width="900" height="900" fill="url(#vignette)"/>
+
+  <g transform="translate(450 450) scale(1.8884) translate(-180 -205.5)"
+     fill="none" stroke="#f5edc9" stroke-width="9.00"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path d="M80 246c26 46 174 46 200 0z"/>
+    <path d="M68 246h224"/>
+    <ellipse cx="126" cy="192" rx="34" ry="46"/>
+    <ellipse cx="200" cy="176" rx="34" ry="46"/>
+    <path d="M126 176v32M200 160v32"/>
+    <path d="M248 210c22-26 22-58 8-78"/>
+  </g>
+</svg>
