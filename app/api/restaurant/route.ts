@@ -78,6 +78,8 @@ export async function PUT(req: NextRequest) {
     businessType?: string;
     accentColor?: string;
     instagram?: string;
+    siteAddress?: string;
+    snapAddress?: string;
     pattern?: string;
   };
   try {
@@ -132,6 +134,8 @@ export async function PUT(req: NextRequest) {
         businessType: body.businessType?.trim() || null,
         accentColor: body.accentColor ?? restaurant.accentColor,
         instagram: body.instagram?.trim() || null,
+        siteAddress: body.siteAddress?.trim() || null,
+        snapAddress: body.snapAddress?.trim() || null,
         pattern: body.pattern?.trim() || null,
       },
     });

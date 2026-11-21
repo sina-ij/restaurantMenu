@@ -23,6 +23,8 @@ export default async function SettingsPage() {
         businessType: restaurant.businessType,
         accentColor: restaurant.accentColor,
         pattern: restaurant.pattern,
+        siteAddress: restaurant.pattern,
+        snapAddress: restaurant.pattern,
       }}
     />
   );

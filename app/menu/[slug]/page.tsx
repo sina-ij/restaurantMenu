@@ -1,7 +1,14 @@
+
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Info, Phone, ForkKnife, InstagramLogo } from "@phosphor-icons/react/dist/ssr";
+import {
+  Info,
+  Phone,
+  ForkKnife,
+  InstagramLogo,
+  Globe,
+} from "@phosphor-icons/react/dist/ssr";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BackgroundPattern } from "@/components/BackgroundPattern";
 import { MenuItemCard } from "@/components/MenuItemCard";
@@ -16,14 +23,23 @@ export const revalidate = 0;
 async function trackView(restaurantId: string) {
   try {
     const now = new Date();
-    const day = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    const day = new Date(
+        Date.UTC(
+            now.getUTCFullYear(),
+            now.getUTCMonth(),
+            now.getUTCDate()
+        )
+    );
+
     await prisma.restaurant.update({
       where: { id: restaurantId },
       data: {
         viewCount: { increment: 1 },
         dailyStats: {
           upsert: {
-            where: { restaurantId_day: { restaurantId, day } },
+            where: {
+              restaurantId_day: { restaurantId, day },
+            },
             create: { day, count: 1 },
             update: { count: { increment: 1 } },
           },
@@ -36,8 +52,8 @@ async function trackView(restaurantId: string) {
 }
 
 export default async function PublicMenuPage({
-  params,
-}: {
+                                               params,
+                                             }: {
   params: { slug: string };
 }) {
   const restaurant = await prisma.restaurant.findUnique({
@@ -60,125 +76,187 @@ export default async function PublicMenuPage({
   await trackView(restaurant.id);
 
   const categoriesWithItems = restaurant.categories.filter(
-    (c) => c.items.length > 0
+      (c) => c.items.length > 0
   );
 
   return (
-    <main className="relative min-h-screen bg-paper">
-      <style dangerouslySetInnerHTML={{ __html: menuThemeStyle(restaurant.accentColor) }} />
-      <BackgroundPattern opacity={0.5} pattern={restaurant.pattern} />
-      <WelcomeSplash
-        slug={restaurant.slug}
-        name={restaurant.name}
-        logoUrl={restaurant.logoUrl}
-        businessType={restaurant.businessType}
-        description={restaurant.description}
-        instagram={restaurant.instagram}
-        phone={restaurant.phone}
-        pattern={restaurant.pattern}
-      />
-      <div className="fixed top-4 left-4 z-20">
-        <ThemeToggle />
-      </div>
-      <header className="relative overflow-hidden border-b border-ink/10 px-6 pt-14 pb-10 text-center">
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-gold/15 to-transparent"
-          aria-hidden="true"
+      <main className="relative min-h-screen bg-paper">
+        <style
+            dangerouslySetInnerHTML={{
+              __html: menuThemeStyle(restaurant.accentColor),
+            }}
         />
-        <Reveal className="relative" y={12}>
-          {restaurant.logoUrl ? (
-            <img
-              src={restaurant.logoUrl}
-              alt={restaurant.name}
-              className="mx-auto mb-4 h-36 w-36 object-contain drop-shadow-md"
-            />
-          ) : (
-            <span className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gold/10 text-gold shadow-soft">
+
+        <BackgroundPattern opacity={0.5} pattern={restaurant.pattern} />
+
+        <WelcomeSplash
+            slug={restaurant.slug}
+            name={restaurant.name}
+            logoUrl={restaurant.logoUrl}
+            businessType={restaurant.businessType}
+            description={restaurant.description}
+            instagram={restaurant.instagram}
+            snapAddress={restaurant.snapAddress}
+            siteAddress={restaurant.siteAddress}
+            phone={restaurant.phone}
+            pattern={restaurant.pattern}
+        />
+
+        <div className="fixed top-4 left-4 z-20">
+          <ThemeToggle />
+        </div>
+
+        <header className="relative overflow-hidden border-b border-ink/10 px-6 pt-14 pb-10 text-center">
+          <div
+              className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-gold/15 to-transparent"
+              aria-hidden="true"
+          />
+
+          <Reveal className="relative" y={12}>
+            {restaurant.logoUrl ? (
+                <img
+                    src={restaurant.logoUrl}
+                    alt={restaurant.name}
+                    className="mx-auto mb-4 h-36 w-36 object-contain drop-shadow-md"
+                />
+            ) : (
+                <span className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gold/10 text-gold shadow-soft">
               <ForkKnife className="h-7 w-7" weight="duotone" />
             </span>
-          )}
-          {restaurant.businessType && (
-            <span className="mb-2 inline-block rounded-full border border-gold/40 px-3 py-1 text-xs text-gold">
+            )}
+
+            {restaurant.businessType && (
+                <span className="mb-2 inline-block rounded-full border border-gold/40 px-3 py-1 text-xs text-gold">
               {restaurant.businessType}
             </span>
-          )}
-          <h1 className="font-brand text-4xl text-ink md:text-5xl">{restaurant.name}</h1>
-          {restaurant.description && (
-            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
-              {restaurant.description}
-            </p>
-          )}
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-            <Link
-              href={`/menu/${restaurant.slug}/about`}
-              className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 px-3.5 py-1.5 text-xs text-ink/80 transition-colors hover:bg-gold/10"
-            >
-              <Info className="h-4 w-4" weight="duotone" />
-              درباره ما
-            </Link>
-            {instagramUrl(restaurant.instagram) && (
-              <a
-                href={instagramUrl(restaurant.instagram)!}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 px-3.5 py-1.5 text-xs text-ink/80 transition-colors hover:bg-gold/10"
-              >
-                <InstagramLogo className="h-4 w-4" weight="duotone" />
-                اینستاگرام
-              </a>
             )}
-          </div>
-        </Reveal>
-      </header>
 
-      {categoriesWithItems.length === 0 ? (
-        <div className="relative flex flex-col items-center gap-4 py-24 text-center">
+            <h1 className="font-brand text-4xl text-ink md:text-5xl">
+              {restaurant.name}
+            </h1>
+
+            {restaurant.description && (
+                <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">
+                  {restaurant.description}
+                </p>
+            )}
+
+            {/* لینک‌های ارتباطی و دسترسی */}
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+              <Link
+                  href={`/menu/${restaurant.slug}/about`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 px-3.5 py-1.5 text-xs text-ink/80 transition-colors hover:bg-gold/10"
+              >
+                <Info className="h-4 w-4" weight="duotone" />
+                درباره ما
+              </Link>
+
+              {instagramUrl(restaurant.instagram) && (
+                  <a
+                      href={instagramUrl(restaurant.instagram)!}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 px-3.5 py-1.5 text-xs text-ink/80 transition-colors hover:bg-gold/10"
+                  >
+                    <InstagramLogo className="h-4 w-4" weight="duotone" />
+                    اینستاگرام
+                  </a>
+              )}
+
+              {restaurant.siteAddress && (
+                  <a
+                      href={restaurant.siteAddress}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 px-3.5 py-1.5 text-xs text-ink/80 transition-colors hover:bg-gold/10"
+                  >
+                    <Globe className="h-4 w-4" weight="duotone" />
+                    وب‌سایت
+                  </a>
+              )}
+
+              {restaurant.snapAddress && (
+                  <a
+                      href={restaurant.snapAddress}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 px-3.5 py-1.5 text-xs text-ink/80 transition-colors hover:bg-gold/10"
+                  >
+                    <ForkKnife
+                        className="h-4 w-4 text-[#EC138D]"
+                        weight="fill"
+                    />
+                    اسنپ فود
+                  </a>
+              )}
+            </div>
+          </Reveal>
+        </header>
+
+        {categoriesWithItems.length === 0 ? (
+            <div className="relative flex flex-col items-center gap-4 py-24 text-center">
           <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gold/10 text-gold">
             <ForkKnife className="h-7 w-7" weight="duotone" />
           </span>
-          <p className="text-muted">منو هنوز آماده نشده، به‌زودی برمی‌گردیم.</p>
-        </div>
-      ) : (
-        <>
-          <CategoryNav
-            categories={categoriesWithItems.map((c) => ({ id: c.id, name: c.name }))}
-          />
+              <p className="text-muted">
+                منو هنوز آماده نشده، به‌زودی برمی‌گردیم.
+              </p>
+            </div>
+        ) : (
+            <>
+              <CategoryNav
+                  categories={categoriesWithItems.map((c) => ({
+                    id: c.id,
+                    name: c.name,
+                  }))}
+              />
 
-          <div className="relative mx-auto max-w-xl space-y-14 px-4 py-10">
-            {categoriesWithItems.map((cat) => (
-              <section key={cat.id} id={`cat-${cat.id}`} className="scroll-mt-20">
-                <Reveal className="mb-6 flex items-center gap-3" y={12}>
-                  {cat.imageUrl && (
-                    <img
-                      src={cat.imageUrl}
-                      alt={cat.name}
-                      className="h-10 w-10 flex-shrink-0 rounded-xl object-cover"
-                    />
-                  )}
-                  <h2 className="whitespace-nowrap font-display text-2xl font-semibold text-ink">
-                    {cat.name}
-                  </h2>
-                  <span className="h-px flex-1 bg-gradient-to-l from-gold/40 to-transparent" />
-                </Reveal>
-                <RevealStagger className="space-y-5">
-                  {cat.items.map((item) => (
-                    <RevealItem key={item.id}>
-                      <MenuItemCard item={item} />
-                    </RevealItem>
-                  ))}
-                </RevealStagger>
-              </section>
-            ))}
-          </div>
-        </>
-      )}
+              <div className="relative mx-auto max-w-xl space-y-14 px-4 py-10">
+                {categoriesWithItems.map((cat) => (
+                    <section
+                        key={cat.id}
+                        id={`cat-${cat.id}`}
+                        className="scroll-mt-20"
+                    >
+                      <Reveal
+                          className="mb-6 flex items-center gap-3"
+                          y={12}
+                      >
+                        {cat.imageUrl && (
+                            <img
+                                src={cat.imageUrl}
+                                alt={cat.name}
+                                className="h-10 w-10 flex-shrink-0 rounded-xl object-cover"
+                            />
+                        )}
 
-      {restaurant.phone && (
-        <footer className="relative flex items-center justify-center gap-2 border-t border-ink/10 py-8 text-center text-sm text-muted">
-          <Phone className="h-4 w-4 text-gold" weight="duotone" />
-          تماس: <span dir="ltr">{restaurant.phone}</span>
-        </footer>
-      )}
-    </main>
+                        <h2 className="whitespace-nowrap font-display text-2xl font-semibold text-ink">
+                          {cat.name}
+                        </h2>
+
+                        <span className="h-px flex-1 bg-gradient-to-l from-gold/40 to-transparent" />
+                      </Reveal>
+
+                      <RevealStagger className="space-y-5">
+                        {cat.items.map((item) => (
+                            <RevealItem key={item.id}>
+                              <MenuItemCard item={item} />
+                            </RevealItem>
+                        ))}
+                      </RevealStagger>
+                    </section>
+                ))}
+              </div>
+            </>
+        )}
+
+        {restaurant.phone && (
+            <footer className="relative flex items-center justify-center gap-2 border-t border-ink/10 py-8 text-center text-sm text-muted">
+              <Phone className="h-4 w-4 text-gold" weight="duotone" />
+              تماس:
+              <span dir="ltr">{restaurant.phone}</span>
+            </footer>
+        )}
+      </main>
   );
 }

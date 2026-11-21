@@ -18,6 +18,8 @@ export type RestaurantInfo = {
   workingHours: string | null;
   locationUrl: string | null;
   instagram: string | null;
+  siteAddress: string | null;
+  snapAddress : string | null;
   businessType: string | null;
   accentColor: string;
   pattern: string | null;
@@ -52,6 +54,8 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
   const [workingHours, setWorkingHours] = useState(restaurant.workingHours ?? "");
   const [locationUrl, setLocationUrl] = useState(restaurant.locationUrl ?? "");
   const [instagram, setInstagram] = useState(restaurant.instagram ?? "");
+  const [siteAddress, setSiteAddress] = useState(restaurant.siteAddress ?? "");
+  const [snapAddress, setSnapAddress] = useState(restaurant.snapAddress ?? "");
   const [logoUrl, setLogoUrl] = useState(restaurant.logoUrl ?? "");
   const [businessType, setBusinessType] = useState(restaurant.businessType ?? "");
   const [accentColor, setAccentColor] = useState(restaurant.accentColor);
@@ -87,6 +91,8 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
       body: JSON.stringify({
         name,
         slug,
+        siteAddress,
+        snapAddress,
         description,
         phone,
         address,
@@ -258,7 +264,34 @@ export default function RestaurantSettings({ restaurant }: { restaurant: Restaur
           </div>
           <p className="text-muted text-xs mt-1">فقط آی‌دی (بدون @) یا لینک کامل</p>
         </div>
+        <div>
+          <label className="block text-sm text-ink mb-1.5 font-medium">آدرس سایت</label>
+          <div className="flex items-center border border-ink/20 rounded-xl bg-white overflow-hidden focus-within:ring-2 focus-within:ring-gold/40 transition-shadow">
 
+            <input
+                type="text"
+                dir="ltr"
+                value={siteAddress}
+                onChange={(e) => setSiteAddress(e.target.value.replace(/^@+/, ""))}
+                placeholder=""
+                className="flex-1 min-w-0 px-3 py-2 bg-white text-left focus:outline-none"
+            />
+          </div>
+          <p className="text-muted text-xs mt-1">آدرس کامل سایت وارد شود</p>
+        </div>
+        <div>
+          <label className="block text-sm text-ink mb-1.5 font-medium">آدرس اسنپ</label>
+          <div className="flex items-center border border-ink/20 rounded-xl bg-white overflow-hidden focus-within:ring-2 focus-within:ring-gold/40 transition-shadow">
+            <input
+                type="text"
+                dir="ltr"
+                value={snapAddress}
+                onChange={(e) => setSnapAddress(e.target.value)}
+                className="flex-1 min-w-0 px-3 py-2 bg-white text-left focus:outline-none"
+            />
+          </div>
+          <p className="text-muted text-xs mt-1">آدرس کامل سایت وارد شود</p>
+        </div>
         <div>
           <label className="block text-sm text-ink mb-2 font-medium">طرحِ پس‌زمینه‌ی منو</label>
           <PatternPicker value={pattern} onChange={setPattern} />
